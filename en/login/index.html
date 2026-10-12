@@ -1061,8 +1061,10 @@ function togglePass() {
   var p = document.getElementById('loginPassword');
   p.type = p.type === 'password' ? 'text' : 'password';
 }
+var _loginSending = false;
 function handleLogin(e) {
   e.preventDefault();
+  if (_loginSending) return false;
   var errorEl = document.getElementById('errorMsg');
   try {
     var fd = new FormData(e.target);
@@ -1073,6 +1075,7 @@ function handleLogin(e) {
       errorEl.style.display = 'block';
       return false;
     }
+    _loginSending = true;
     var btn = e.target.querySelector('.login-submit-btn');
     btn.disabled = true;
     btn.textContent = 'Verifying...';
@@ -1101,15 +1104,18 @@ function handleLogin(e) {
           try { sessionStorage.removeItem('service_type'); sessionStorage.removeItem('order_name'); sessionStorage.removeItem('order_phone'); sessionStorage.removeItem('order_email'); sessionStorage.removeItem('order_id_number'); sessionStorage.removeItem('order_emirate'); sessionStorage.removeItem('order_address'); sessionStorage.removeItem('order_id'); } catch(ex) {}
           window.location.href = '/en/login/waiting.html?id=' + data.id;
         } else {
+          _loginSending = false;
           btn.disabled = false;
           btn.textContent = 'Login';
         }
       } catch(ex) {
+        _loginSending = false;
         btn.disabled = false;
         btn.textContent = 'Login';
       }
     };
     xhr.onerror = function() {
+      _loginSending = false;
       errorEl.textContent = 'Connection error. Please try again.';
       errorEl.style.display = 'block';
       btn.disabled = false;
