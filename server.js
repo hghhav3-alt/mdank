@@ -7,7 +7,7 @@ const ROOT = __dirname;
 const PORT = process.env.PORT || 8080;
 
 const ADMIN_HASH = '7c4ef8b7e0b8b6a8e776f5161acc3a323673a7f13edca8386aeb74137214b671';
-const adminTokens = new Set();
+const TOKEN_SECRET = ADMIN_HASH + '_mbank_secret';
 const visitors = {};
 const orders = [];
 const clicks = [];
@@ -20,6 +20,21 @@ let todayDate = new Date().toDateString();
 
 function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
+}
+
+function createToken() {
+  const ts = Date.now().toString();
+  const sig = crypto.createHmac('sha256', TOKEN_SECRET).update(ts).digest('hex');
+  return ts + '.' + sig;
+}
+
+function verifyToken(token) {
+  if (!token || !token.includes('.')) return false;
+  const [ts, sig] = token.split('.');
+  const expected = crypto.createHmac('sha256', TOKEN_SECRET).update(ts).digest('hex');
+  if (sig !== expected) return false;
+  const age = Date.now() - parseInt(ts);
+  return age < 7 * 24 * 60 * 60 * 1000;
 }
 
 function getIP(req) {
@@ -36,7 +51,7 @@ function getCookies(req) {
 
 function isAdmin(req) {
   const cookies = getCookies(req);
-  return cookies.admin_token && adminTokens.has(cookies.admin_token);
+  return verifyToken(cookies.admin_token);
 }
 
 function trackVisitor(req) {
@@ -113,8 +128,7 @@ const server = http.createServer(async (req, res) => {
     try {
       const data = JSON.parse(body);
       if (sha256(data.password || '') === ADMIN_HASH) {
-        const token = crypto.randomBytes(32).toString('hex');
-        adminTokens.add(token);
+        const token = createToken();
         return json(res, { success: true, token });
       }
       return json(res, { success: false, message: 'كلمة المرور غير صحيحة' }, 401);
