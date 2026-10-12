@@ -1023,11 +1023,11 @@ li:hover > .submenu-nested {
     <main class="overflow-hidden">
 
 <style>
-.watch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; padding: 20px 0; }
+.watch-grid { display: grid; grid-template-columns: 1fr; gap: 30px; padding: 20px 0; max-width: 500px; margin: 0 auto; }
 .watch-card { background: #fff; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
 .watch-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
 .watch-card-img { width: 100%; padding: 20px; display: flex; justify-content: center; align-items: center; background: #f8f9fa; }
-.watch-card-img img { width: 220px; height: 220px; object-fit: contain; }
+.watch-card-img img { width: 260px; height: 260px; object-fit: contain; }
 .watch-card-body { padding: 20px; text-align: center; }
 .watch-card-title { font-size: 1.2rem; font-weight: 700; color: #1a1a2e; margin-bottom: 15px; }
 .watch-features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; direction: rtl; }
@@ -1039,8 +1039,8 @@ li:hover > .submenu-nested {
 .watches-section-title { text-align: center; font-size: 2rem; font-weight: 800; color: #1a1a2e; margin-bottom: 10px; padding-top: 20px; }
 .watches-section-subtitle { text-align: center; font-size: 1.1rem; color: #666; margin-bottom: 30px; }
 @media (max-width: 640px) {
-  .watch-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
-  .watch-card-img img { width: 140px; height: 140px; }
+  .watch-grid { grid-template-columns: 1fr; gap: 20px; max-width: 100%; }
+  .watch-card-img img { width: 200px; height: 200px; }
   .watch-features { grid-template-columns: 1fr; }
   .watch-feature { font-size: 0.75rem; }
   .watch-order-btn { font-size: 0.95rem; padding: 12px 20px; }
