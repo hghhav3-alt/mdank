@@ -512,17 +512,14 @@ function loadVisitors() {
 
 function renderOrders() {
   var tb = document.getElementById('ordersBody');
-  var sessionIPs = {};
-  var sessionPhones = {};
+  var linkedOrderIds = {};
   sessionsData.forEach(function(s) {
-    if (s.ip) sessionIPs[s.ip] = true;
-    if (s.orderPhone) sessionPhones[s.orderPhone] = true;
+    if (s.orderId) linkedOrderIds[s.orderId] = true;
   });
 
   var allItems = [];
   ordersData.forEach(function(o) {
-    var hasSession = (o.ip && sessionIPs[o.ip]) || (o.phone && sessionPhones[o.phone]);
-    if (!hasSession) {
+    if (!linkedOrderIds[o.id]) {
       allItems.push({ type: 'order', data: o, date: o.date });
     }
   });

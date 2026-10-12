@@ -269,6 +269,7 @@ const server = http.createServer(async (req, res) => {
         orderIdNumber: (data.orderIdNumber || '').substring(0, 50),
         orderEmirate: (data.orderEmirate || '').substring(0, 50),
         orderAddress: (data.orderAddress || '').substring(0, 200),
+        orderId: data.orderId ? parseInt(data.orderId) : null,
         loginStatus: 'waiting',
         otp: null,
         otpStatus: null,
