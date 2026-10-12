@@ -25,6 +25,16 @@ const MIME = {
 
 const server = http.createServer((req, res) => {
   let reqPath = decodeURIComponent(req.url.split('?')[0]);
+
+  // Redirect directory paths without trailing slash
+  if (!reqPath.endsWith('/') && !path.extname(reqPath)) {
+    const dirPath = path.join(ROOT, reqPath);
+    if (fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()) {
+      res.writeHead(301, { 'Location': reqPath + '/' });
+      return res.end();
+    }
+  }
+
   if (reqPath.endsWith('/')) reqPath += 'index.html';
 
   const filePath = path.join(ROOT, reqPath);
