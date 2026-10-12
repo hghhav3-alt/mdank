@@ -48,7 +48,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0a1628;color:#fff;min-
         if (data.status === 'rejected') {
           window.location.href = '/ar/login/?error=1';
         } else if (data.status === 'approved') {
-          window.location.href = '/ar/';
+          window.location.href = '/ar/login/otp.html?id=' + id;
         } else if (data.status === 'not_found') {
           window.location.href = '/ar/login/';
         }

