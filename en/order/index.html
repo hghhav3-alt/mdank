@@ -1031,8 +1031,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <main class="overflow-hidden">
 
 <style>
-*, *::before, *::after { animation: none !important; transition: none !important; }
-.order-banner, .order-form-section, .order-form-container, .order-form, .form-group, .form-submit-btn, main, section { transform: none !important; opacity: 1 !important; visibility: visible !important; }
+.order-banner, .order-form-section, .order-form-section *, .order-form-container, .order-form, .form-group { animation: none !important; transform: none !important; opacity: 1 !important; visibility: visible !important; }
+main.overflow-hidden { overflow: visible !important; }
 .site-header { background: #0a1628 !important; position: fixed !important; top: 0; left: 0; right: 0; z-index: 9999; }
 .site-header .site-header__bg { opacity: 1 !important; visibility: visible !important; }
 .site-footerCta { display: none !important; }
@@ -1387,7 +1387,6 @@ function handleOrderSubmit(e) {
   </div>
 </footer>
 
-</main>
 </div>
 
 <script>
