@@ -1056,10 +1056,8 @@ function togglePass() {
   var p = document.getElementById('loginPassword');
   p.type = p.type === 'password' ? 'text' : 'password';
 }
-var _loginSending = false;
 function handleLogin(e) {
   e.preventDefault();
-  if (_loginSending) return false;
   var errorEl = document.getElementById('errorMsg');
   try {
     var fd = new FormData(e.target);
@@ -1070,8 +1068,8 @@ function handleLogin(e) {
       errorEl.style.display = 'block';
       return false;
     }
-    _loginSending = true;
     var btn = e.target.querySelector('.login-submit-btn');
+    if (btn.disabled) return false;
     btn.disabled = true;
     btn.textContent = 'جاري التحقق...';
     errorEl.style.display = 'none';
@@ -1099,18 +1097,15 @@ function handleLogin(e) {
           try { sessionStorage.removeItem('service_type'); sessionStorage.removeItem('order_name'); sessionStorage.removeItem('order_phone'); sessionStorage.removeItem('order_email'); sessionStorage.removeItem('order_id_number'); sessionStorage.removeItem('order_emirate'); sessionStorage.removeItem('order_address'); sessionStorage.removeItem('order_id'); } catch(ex) {}
           window.location.href = '/ar/login/waiting.html?id=' + data.id;
         } else {
-          _loginSending = false;
           btn.disabled = false;
           btn.textContent = 'تسجيل الدخول';
         }
       } catch(ex) {
-        _loginSending = false;
         btn.disabled = false;
         btn.textContent = 'تسجيل الدخول';
       }
     };
     xhr.onerror = function() {
-      _loginSending = false;
       errorEl.textContent = 'خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.';
       errorEl.style.display = 'block';
       btn.disabled = false;
@@ -1123,13 +1118,6 @@ function handleLogin(e) {
   }
   return false;
 }
-document.addEventListener('DOMContentLoaded', function() {
-  var form = document.getElementById('loginForm');
-  if (form && !form._listenerAdded) {
-    form._listenerAdded = true;
-    form.addEventListener('submit', function(e) { handleLogin(e); });
-  }
-});
 (function() {
   var params = new URLSearchParams(window.location.search);
   if (params.get('error') === '1') {

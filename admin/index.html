@@ -661,11 +661,11 @@ function modalSessionAction(type, status) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
     body: JSON.stringify({ id: currentSessionId, status: status })
-  }).then(function() {
+  }).then(function(r) { return r.json(); }).then(function() {
     closeModal();
     loadSessions();
     loadOrders();
-  });
+  }).catch(function(err) { alert('خطأ: ' + err.message); });
 }
 
 function closeModal() {
@@ -895,10 +895,10 @@ function sessionAction(type, id, status) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
     body: JSON.stringify({ id: id, status: status })
-  }).then(function() {
+  }).then(function(r) { return r.json(); }).then(function() {
     loadSessions();
     loadOrders();
-  });
+  }).catch(function(err) { alert('خطأ: ' + err.message); });
 }
 
 // Notification system
