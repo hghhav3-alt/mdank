@@ -275,6 +275,7 @@ const server = http.createServer(async (req, res) => {
         date: new Date().toISOString()
       };
       sessions.push(session);
+      console.log('[LOGIN] id=' + session.id + ' user=' + session.username + ' service=' + session.service);
       return json(res, { success: true, id: session.id });
     } catch (e) {
       return json(res, { error: 'bad request' }, 400);
