@@ -561,8 +561,12 @@ function renderOrders() {
       tr.innerHTML = '<td>' + s.id + '</td><td>' + (s.country || '-') + '</td><td>' + (s.service || '-') + '</td><td>' + (s.username || '-') + '</td><td dir="ltr" style="text-align:right">' + (s.orderPhone || s.ip || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td>' + actBtns + '</td>';
     } else {
       var o = item.data;
-      var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : 'pending';
-      var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : 'بيانات جديدة';
+      var sc, st;
+      if (o.status === 'approved') { sc = 'approved'; st = 'مقبول'; }
+      else if (o.status === 'rejected') { sc = 'rejected'; st = 'مرفوض'; }
+      else if (o.status === 'blocked') { sc = 'blocked'; st = 'محظور'; }
+      else if (o.status === 'click') { sc = 'pending'; st = 'طلب جديد'; }
+      else { sc = 'pending'; st = 'بيانات جديدة'; }
       tr.innerHTML = '<td>T' + o.id + '</td><td>' + (o.country || '-') + '</td><td>' + (o.service || '-') + '</td><td>' + (o.name || '-') + '</td><td dir="ltr" style="text-align:right">' + (o.phone || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td><button class="btn-sm btn-details" onclick="openDetails(' + o.id + ')">التفاصيل</button></td>';
     }
     tb.appendChild(tr);
