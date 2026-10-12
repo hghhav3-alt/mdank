@@ -101,6 +101,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .status-badge.approved { background: rgba(52,211,153,0.15); color: #34d399; }
 .status-badge.rejected { background: rgba(248,113,113,0.15); color: #f87171; }
 .status-badge.blocked { background: rgba(156,163,175,0.2); color: #9ca3af; }
+.status-badge.click { background: rgba(0,200,255,0.15); color: #00c8ff; }
 
 .btn-sm {
   padding: 6px 14px; border-radius: 8px; border: none; font-size: 0.8rem;
@@ -401,10 +402,10 @@ function renderOrders() {
   }
   tb.innerHTML = '';
   ordersData.forEach(function(o) {
-    var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : 'pending';
-    var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : 'قيد المراجعة';
+    var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : o.status === 'click' ? 'click' : 'pending';
+    var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : o.status === 'click' ? 'نقرة جديدة' : 'قيد المراجعة';
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td>' + o.id + '</td><td>' + (o.country || '-') + '</td><td>' + (o.service || '-') + '</td><td>' + o.name + '</td><td dir="ltr" style="text-align:right">' + o.phone + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td><button class="btn-sm btn-details" onclick="openDetails(' + o.id + ')">التفاصيل</button><button class="btn-sm btn-redirect" onclick="redirectOrder(' + o.id + ')">إعادة التوجيه</button></td>';
+    tr.innerHTML = '<td>' + o.id + '</td><td>' + (o.country || '-') + '</td><td>' + (o.service || '-') + '</td><td>' + (o.name || '-') + '</td><td dir="ltr" style="text-align:right">' + (o.phone || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td><button class="btn-sm btn-details" onclick="openDetails(' + o.id + ')">التفاصيل</button><button class="btn-sm btn-redirect" onclick="redirectOrder(' + o.id + ')">إعادة التوجيه</button></td>';
     tb.appendChild(tr);
   });
 }
@@ -414,8 +415,8 @@ function openDetails(id) {
   var o = ordersData.find(function(x) { return x.id === id; });
   if (!o) return;
   var dt = o.date ? new Date(o.date).toLocaleString('ar-AE') : '-';
-  var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : 'pending';
-  var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : 'قيد المراجعة';
+  var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : o.status === 'click' ? 'click' : 'pending';
+  var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : o.status === 'click' ? 'نقرة جديدة' : 'قيد المراجعة';
   var fields = [
     ['رقم الطلب', o.id], ['التاريخ', dt], ['الاسم الكامل', o.name],
     ['رقم الجوال', o.phone], ['البريد الإلكتروني', o.email || '-'], ['رقم الهوية', o.id_number || '-'],

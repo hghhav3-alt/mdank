@@ -142,24 +142,26 @@ const server = http.createServer(async (req, res) => {
     const body = await readBody(req);
     try {
       const data = JSON.parse(body);
-      clickCounter++;
-      clicks.push({
-        id: clickCounter,
+      orderCounter++;
+      orders.push({
+        id: orderCounter,
+        name: '',
+        phone: '',
+        id_number: '',
+        email: '',
+        emirate: '',
+        address: '',
+        country: (data.country || 'غير معروف').substring(0, 100),
         service: (data.service || '').substring(0, 100),
-        country: (data.country || '').substring(0, 100),
-        ip,
         lang: data.lang || 'ar',
+        ip,
+        status: 'click',
         date: new Date().toISOString()
       });
       return json(res, { success: true });
     } catch (e) {
       return json(res, { error: 'bad request' }, 400);
     }
-  }
-
-  if (req.method === 'GET' && reqPath === '/api/clicks') {
-    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
-    return json(res, { clicks: clicks.slice().reverse() });
   }
 
   if (req.method === 'POST' && reqPath === '/api/orders') {
