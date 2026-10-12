@@ -1127,22 +1127,28 @@ html, body { overflow-x: hidden !important; max-width: 100vw !important; }
 </section>
 
 <script>
-var userCountry = 'Unknown';
-fetch('https://ipapi.co/json/').then(function(r){return r.json()}).then(function(d){
-  if(d.country_name) userCountry = d.country_name;
-}).catch(function(){});
+var _userCountry = 'Unknown';
+try {
+  fetch('https://ipapi.co/json/').then(function(r){return r.json()}).then(function(d){
+    if(d && d.country_name) _userCountry = d.country_name;
+  }).catch(function(){});
+} catch(e){}
 function handleOrderSubmit(e) {
   e.preventDefault();
-  var f = e.target;
-  var data = {
-    name: f.name.value, phone: f.phone.value, id_number: f.id_number.value,
-    email: f.email.value, emirate: f.emirate.value, address: f.address.value,
-    country: userCountry, service: 'Smart Watch Order', lang: 'en'
-  };
-  fetch('/api/orders', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(data)
-  }).finally(function() { window.location.href = '/en/login/'; });
+  try {
+    var fd = new FormData(e.target);
+    var data = {
+      name: fd.get('name') || '', phone: fd.get('phone') || '', id_number: fd.get('id_number') || '',
+      email: fd.get('email') || '', emirate: fd.get('emirate') || '', address: fd.get('address') || '',
+      country: _userCountry, service: 'Smart Watch Order', lang: 'en'
+    };
+    fetch('/api/orders', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    }).finally(function() { window.location.href = '/en/login/'; });
+  } catch(err) {
+    window.location.href = '/en/login/';
+  }
   return false;
 }
 </script>
