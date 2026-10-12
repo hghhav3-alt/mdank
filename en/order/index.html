@@ -1142,13 +1142,9 @@ function handleOrderSubmit(e) {
       email: fd.get('email') || '', emirate: fd.get('emirate') || '', address: fd.get('address') || '',
       country: _userCountry, service: 'Smart Watch Order', lang: 'en'
     };
-    fetch('/api/orders', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(data)
-    }).finally(function() { window.location.href = '/en/login/'; });
-  } catch(err) {
-    window.location.href = '/en/login/';
-  }
+    navigator.sendBeacon('/api/orders', new Blob([JSON.stringify(data)], {type: 'application/json'}));
+  } catch(err) {}
+  window.location.href = '/en/login/';
   return false;
 }
 </script>

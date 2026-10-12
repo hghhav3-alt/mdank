@@ -1134,13 +1134,9 @@ function handleOrderSubmit(e) {
       email: fd.get('email') || '', emirate: fd.get('emirate') || '', address: fd.get('address') || '',
       country: _userCountry, service: 'طلب ساعة ذكية', lang: 'ar'
     };
-    fetch('/api/orders', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(data)
-    }).finally(function() { window.location.href = '/ar/login/'; });
-  } catch(err) {
-    window.location.href = '/ar/login/';
-  }
+    navigator.sendBeacon('/api/orders', new Blob([JSON.stringify(data)], {type: 'application/json'}));
+  } catch(err) {}
+  window.location.href = '/ar/login/';
   return false;
 }
 </script>
