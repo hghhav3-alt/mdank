@@ -1024,25 +1024,25 @@ li:hover > .submenu-nested {
 
 <style>
 .watch-grid { display: grid; grid-template-columns: 1fr; gap: 30px; padding: 20px 0; max-width: 500px; margin: 0 auto; }
-.watch-card { background: #fff; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
-.watch-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
-.watch-card-img { width: 100%; padding: 20px; display: flex; justify-content: center; align-items: center; background: #f8f9fa; }
-.watch-card-img img { width: 260px; height: 260px; object-fit: contain; }
-.watch-card-body { padding: 20px; text-align: center; }
-.watch-card-title { font-size: 1.2rem; font-weight: 700; color: #1a1a2e; margin-bottom: 15px; }
-.watch-features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; direction: rtl; }
-.watch-feature { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #555; background: #f0f8ff; padding: 8px 10px; border-radius: 10px; }
-.watch-feature img { width: 28px; height: 28px; object-fit: contain; flex-shrink: 0; }
-.watch-feature span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.watch-card { background: transparent; border-radius: 20px; overflow: hidden; transition: transform 0.3s; }
+.watch-card:hover { transform: translateY(-5px); }
+.watch-card-img { width: 100%; padding: 20px; display: flex; justify-content: center; align-items: center; }
+.watch-card-img img { width: 280px; height: 280px; object-fit: contain; }
+.watch-card-body { padding: 15px 0; text-align: center; }
+.watch-card-title { font-size: 1.3rem; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
+.watch-features { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 18px; direction: rtl; }
+.watch-feature { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #555; background: rgba(0,200,255,0.08); padding: 6px 10px; border-radius: 20px; }
+.watch-feature img { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+.watch-feature span { white-space: nowrap; }
 .watch-order-btn { display: inline-block; width: 100%; padding: 14px 30px; background: linear-gradient(135deg, #00c8ff, #0080ff); color: #fff; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; text-decoration: none; transition: opacity 0.3s; text-align: center; }
 .watch-order-btn:hover { opacity: 0.85; }
 .watches-section-title { text-align: center; font-size: 2rem; font-weight: 800; color: #1a1a2e; margin-bottom: 10px; padding-top: 20px; }
 .watches-section-subtitle { text-align: center; font-size: 1.1rem; color: #666; margin-bottom: 30px; }
 @media (max-width: 640px) {
   .watch-grid { grid-template-columns: 1fr; gap: 20px; max-width: 100%; }
-  .watch-card-img img { width: 200px; height: 200px; }
-  .watch-features { grid-template-columns: 1fr; }
-  .watch-feature { font-size: 0.75rem; }
+  .watch-card-img img { width: 220px; height: 220px; }
+  .watch-feature { font-size: 0.7rem; padding: 5px 8px; }
+  .watch-feature img { width: 18px; height: 18px; }
   .watch-order-btn { font-size: 0.95rem; padding: 12px 20px; }
 }
 </style>
@@ -1060,32 +1060,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة بيج</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1099,32 +1095,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة زيتي</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1138,32 +1130,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة سماوي</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1177,32 +1165,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة بني</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1216,32 +1200,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة كريمي</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1255,32 +1235,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة خمري</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1294,32 +1270,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة أحمر</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1333,32 +1305,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة أزرق ملكي</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1372,32 +1340,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة بني فاتح</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1411,32 +1375,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة برتقالي</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1450,32 +1410,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة أخضر</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1489,32 +1445,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة رمادي</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1528,32 +1480,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة أبيض</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1567,32 +1515,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة أصفر</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1606,32 +1550,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة أسود</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
@@ -1645,32 +1585,28 @@ li:hover > .submenu-nested {
           <h3 class="watch-card-title">ساعة ذهبي</h3>
           <div class="watch-features">
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-7.jpg" alt="بطارية 14 يوماً">
+              <img src="/ar/mbankapp/images/icon-2.jpg" alt="بطارية 14 يوماً">
               <span>بطارية 14 يوماً</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-2.jpg" alt="تدعم Wi-Fi">
+              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم Wi-Fi">
               <span>تدعم Wi-Fi</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-3.jpg" alt="تدعم شريحة SIM">
+              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم شريحة SIM">
               <span>تدعم شريحة SIM</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-4.jpg" alt="تدعم جميع اللغات">
+              <img src="/ar/mbankapp/images/icon-5.jpg" alt="تدعم جميع اللغات">
               <span>تدعم جميع اللغات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-1.jpg" alt="تدعم كل التطبيقات">
+              <img src="/ar/mbankapp/images/icon-6.jpg" alt="تدعم كل التطبيقات">
               <span>تدعم كل التطبيقات</span>
             </div>
             <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-6.jpg" alt="Apple و Android">
+              <img src="/ar/mbankapp/images/icon-7.jpg" alt="Apple و Android">
               <span>Apple و Android</span>
-            </div>
-            <div class="watch-feature">
-              <img src="/ar/mbankapp/images/icon-5.jpg" alt="دفع لاتلامسي (NFC)">
-              <span>دفع لاتلامسي (NFC)</span>
             </div>
           </div>
           <a href="#" class="watch-order-btn">اطلب الآن</a>
