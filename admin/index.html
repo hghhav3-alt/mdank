@@ -339,8 +339,16 @@ function showTab(tab) {
   if (tab === 'visitors') loadVisitors();
 }
 
+var adminToken = '';
+try { adminToken = localStorage.getItem('admin_token') || ''; } catch(e) {}
+
+function authHeaders() {
+  return { 'X-Admin-Token': adminToken };
+}
+
 function checkAuth(r) {
   if (r.status === 401) {
+    try { localStorage.removeItem('admin_token'); } catch(e) {}
     document.cookie = 'admin_token=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
     window.location.href = '/admin/';
     return null;
@@ -360,7 +368,7 @@ function loadStats() {
 }
 
 function loadOrders() {
-  fetch('/api/orders').then(checkAuth).then(function(d) {
+  fetch('/api/orders', { headers: authHeaders() }).then(checkAuth).then(function(d) {
     if (!d) return;
     ordersData = d.orders || [];
     renderOrders();
@@ -368,7 +376,7 @@ function loadOrders() {
 }
 
 function loadVisitors() {
-  fetch('/api/visitors').then(checkAuth).then(function(d) {
+  fetch('/api/visitors', { headers: authHeaders() }).then(checkAuth).then(function(d) {
     if (!d) return;
     var vb = document.getElementById('visitorsBody');
     var list = d.visitors || [];
@@ -440,7 +448,7 @@ function actionOrder(action) {
   if (currentOrderId < 0) return;
   fetch('/api/orders/status', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
     body: JSON.stringify({ id: currentOrderId, status: action })
   }).then(function() {
     closeModal();
@@ -454,7 +462,7 @@ function blockIP() {
   if (!o) return;
   fetch('/api/block-ip', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
     body: JSON.stringify({ ip: o.ip })
   }).then(function() {
     closeModal();

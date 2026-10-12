@@ -50,6 +50,8 @@ function getCookies(req) {
 }
 
 function isAdmin(req) {
+  const header = req.headers['x-admin-token'];
+  if (header && verifyToken(header)) return true;
   const cookies = getCookies(req);
   return verifyToken(cookies.admin_token);
 }
