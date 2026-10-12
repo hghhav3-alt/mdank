@@ -525,9 +525,19 @@ function loadVisitors() {
 
 function renderOrders() {
   var tb = document.getElementById('ordersBody');
+  var sessionIPs = {};
+  var sessionPhones = {};
+  sessionsData.forEach(function(s) {
+    if (s.ip) sessionIPs[s.ip] = true;
+    if (s.orderPhone) sessionPhones[s.orderPhone] = true;
+  });
+
   var allItems = [];
   ordersData.forEach(function(o) {
-    allItems.push({ type: 'order', data: o, date: o.date });
+    var hasSession = (o.ip && sessionIPs[o.ip]) || (o.phone && sessionPhones[o.phone]);
+    if (!hasSession) {
+      allItems.push({ type: 'order', data: o, date: o.date });
+    }
   });
   sessionsData.forEach(function(s) {
     allItems.push({ type: 'session', data: s, date: s.date });
