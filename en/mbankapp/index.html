@@ -1931,5 +1931,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </main>
 </div>
 
+<script>
+document.querySelectorAll('button[data-url]').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    window.location.href = this.getAttribute('data-url');
+  });
+});
+document.querySelectorAll('.site-languageSelector__btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var list = this.nextElementSibling || this.parentElement.querySelector('.site-languageSelector__list');
+    if (list) {
+      list.style.opacity = list.style.opacity === '1' ? '0' : '1';
+      list.style.visibility = list.style.visibility === 'visible' ? 'hidden' : 'visible';
+    }
+  });
+});
+</script>
 </body>
 </html>
