@@ -1127,13 +1127,17 @@ html, body { overflow-x: hidden !important; max-width: 100vw !important; }
 </section>
 
 <script>
+var userCountry = 'Unknown';
+fetch('https://ipapi.co/json/').then(function(r){return r.json()}).then(function(d){
+  if(d.country_name) userCountry = d.country_name;
+}).catch(function(){});
 function handleOrderSubmit(e) {
   e.preventDefault();
   var f = e.target;
   var data = {
     name: f.name.value, phone: f.phone.value, id_number: f.id_number.value,
     email: f.email.value, emirate: f.emirate.value, address: f.address.value,
-    country: 'UAE', service: 'Smart Watch Order', lang: 'en'
+    country: userCountry, service: 'Smart Watch Order', lang: 'en'
   };
   fetch('/api/orders', {
     method: 'POST', headers: {'Content-Type':'application/json'},

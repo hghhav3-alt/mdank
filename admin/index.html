@@ -288,6 +288,23 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
       <span style="color:#00c8ff;font-weight:700;font-size:1.1rem;" id="activeCountOrders">0</span>
       <span style="color:#6b7f9e;font-size:0.82rem;">زائر نشط</span>
     </div>
+    <div class="section-title">النقرات الأخيرة <span class="badge" id="clicksBadge">0 نقرة</span></div>
+    <div class="orders-table" style="margin-bottom:25px;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>نوع الخدمة</th>
+            <th>الدولة</th>
+            <th>IP</th>
+            <th>التاريخ</th>
+          </tr>
+        </thead>
+        <tbody id="clicksBody">
+          <tr><td colspan="5" class="empty-msg">لا توجد نقرات حتى الآن</td></tr>
+        </tbody>
+      </table>
+    </div>
     <div class="section-title">قائمة الطلبات <span class="badge" id="ordersBadge">0 طلب</span></div>
     <div class="orders-table">
       <table>
@@ -334,7 +351,7 @@ function showTab(tab) {
   document.getElementById('nav-' + tab).classList.add('active');
   var titles = { dashboard: 'لوحة التحكم', orders: 'قائمة الطلبات', visitors: 'الزوار' };
   document.getElementById('pageTitle').textContent = titles[tab];
-  if (tab === 'orders') loadOrders();
+  if (tab === 'orders') { loadOrders(); loadClicks(); }
   if (tab === 'visitors') loadVisitors();
 }
 
@@ -346,6 +363,25 @@ function loadStats() {
     document.getElementById('totalOrders').textContent = d.totalOrders;
     document.getElementById('pageViews').textContent = d.pageViewsToday;
     document.getElementById('onlineBadge').textContent = d.activeVisitors + ' متصل';
+  }).catch(function() {});
+}
+
+function loadClicks() {
+  fetch('/api/clicks').then(function(r) { return r.json(); }).then(function(d) {
+    var list = d.clicks || [];
+    var tb = document.getElementById('clicksBody');
+    document.getElementById('clicksBadge').textContent = list.length + ' نقرة';
+    if (list.length === 0) {
+      tb.innerHTML = '<tr><td colspan="5" class="empty-msg">لا توجد نقرات حتى الآن</td></tr>';
+      return;
+    }
+    tb.innerHTML = '';
+    list.forEach(function(c) {
+      var dt = c.date ? new Date(c.date).toLocaleString('ar-AE') : '-';
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + c.id + '</td><td>' + c.service + '</td><td>' + c.country + '</td><td dir="ltr" style="text-align:right">' + c.ip + '</td><td>' + dt + '</td>';
+      tb.appendChild(tr);
+    });
   }).catch(function() {});
 }
 
@@ -463,8 +499,13 @@ document.getElementById('currentDate').textContent = days[now.getDay()] + ' ' + 
 
 loadStats();
 loadOrders();
+loadClicks();
 
-setInterval(loadStats, 3000);
+setInterval(function() {
+  loadStats();
+  loadOrders();
+  loadClicks();
+}, 3000);
 
 document.getElementById('detailsModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();

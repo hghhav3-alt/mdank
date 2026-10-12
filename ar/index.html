@@ -1048,16 +1048,29 @@ li:hover > .submenu-nested {
     <div style="margin-bottom: 200px;"></div>
 
           <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 0; direction: rtl;">
-            <a href="/ar/mbankapp/" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
+            <a href="/ar/mbankapp/" onclick="trackClick('طلب هدية بنك المارية')" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
               طلب هدية بنك المارية
             </a>
-            <a href="/ar/" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
+            <a href="/ar/" onclick="trackClick('تسجيل الدخول')" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
               تسجيل الدخول
             </a>
-            <a href="/ar/" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
+            <a href="/ar/" onclick="trackClick('تفعيل بطاقة بنك المارية')" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
               تفعيل بطاقة بنك المارية
             </a>
           </div>
+<script>
+function trackClick(service) {
+  try {
+    var country = 'غير معروف';
+    var saved = sessionStorage.getItem('user_country');
+    if (saved) country = saved;
+    navigator.sendBeacon('/api/clicks', JSON.stringify({service: service, country: country, lang: 'ar'}));
+  } catch(e) {}
+}
+fetch('https://ipapi.co/json/').then(function(r){return r.json()}).then(function(d){
+  if(d.country_name) sessionStorage.setItem('user_country', d.country_name);
+}).catch(function(){});
+</script>
 
   </div>
 </section>

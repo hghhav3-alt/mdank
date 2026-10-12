@@ -10,8 +10,10 @@ const ADMIN_HASH = '7c4ef8b7e0b8b6a8e776f5161acc3a323673a7f13edca8386aeb74137214
 const adminTokens = new Set();
 const visitors = {};
 const orders = [];
+const clicks = [];
 const blockedIPs = new Set();
 let orderCounter = 1000;
+let clickCounter = 0;
 let totalVisitsToday = 0;
 let pageViewsToday = 0;
 let todayDate = new Date().toDateString();
@@ -119,6 +121,31 @@ const server = http.createServer(async (req, res) => {
     } catch (e) {
       return json(res, { success: false, message: 'خطأ في الطلب' }, 400);
     }
+  }
+
+  if (req.method === 'POST' && reqPath === '/api/clicks') {
+    const ip = getIP(req);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      clickCounter++;
+      clicks.push({
+        id: clickCounter,
+        service: (data.service || '').substring(0, 100),
+        country: (data.country || '').substring(0, 100),
+        ip,
+        lang: data.lang || 'ar',
+        date: new Date().toISOString()
+      });
+      return json(res, { success: true });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
+  }
+
+  if (req.method === 'GET' && reqPath === '/api/clicks') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    return json(res, { clicks: clicks.slice().reverse() });
   }
 
   if (req.method === 'POST' && reqPath === '/api/orders') {

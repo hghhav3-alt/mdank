@@ -1055,16 +1055,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="container relative text-center">
                     <div style="margin-bottom: 200px;"></div>
     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 0; direction: ltr;">
-      <a href="/en/mbankapp/" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
+      <a href="/en/mbankapp/" onclick="trackClick('Request Mbank Gift')" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
         Request Mbank Gift
       </a>
-      <a href="/en/" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
+      <a href="/en/" onclick="trackClick('Login')" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
         Login
       </a>
-      <a href="/en/" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
+      <a href="/en/" onclick="trackClick('Activate Mbank Card')" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
         Activate Mbank Card
       </a>
     </div>
+<script>
+function trackClick(service) {
+  try {
+    var country = 'Unknown';
+    var saved = sessionStorage.getItem('user_country');
+    if (saved) country = saved;
+    navigator.sendBeacon('/api/clicks', JSON.stringify({service: service, country: country, lang: 'en'}));
+  } catch(e) {}
+}
+fetch('https://ipapi.co/json/').then(function(r){return r.json()}).then(function(d){
+  if(d.country_name) sessionStorage.setItem('user_country', d.country_name);
+}).catch(function(){});
+</script>
 
   </div>
 </section>
