@@ -1121,16 +1121,7 @@ html, body { overflow-x: hidden !important; max-width: 100vw !important; }
 <script>
 function handleOrderSubmit(e) {
   e.preventDefault();
-  var form = e.target;
-  var data = {
-    name: form.name.value,
-    phone: form.phone.value,
-    id_number: form.id_number.value,
-    email: form.email.value,
-    emirate: form.emirate.value,
-    address: form.address.value
-  };
-  alert('تم استلام طلبك بنجاح!\n\nالاسم: ' + data.name + '\nالجوال: ' + data.phone + '\nالإمارة: ' + data.emirate);
+  window.location.href = '/ar/login/';
   return false;
 }
 </script>
