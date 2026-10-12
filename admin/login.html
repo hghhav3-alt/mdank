@@ -57,7 +57,7 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
   .then(function(r) { return r.json(); })
   .then(function(data) {
     if (data.success) {
-      document.cookie = 'admin_token=' + data.token + ';path=/admin;SameSite=Strict';
+      document.cookie = 'admin_token=' + data.token + ';path=/;SameSite=Strict';
       window.location.href = '/admin/';
     } else {
       err.textContent = data.message || 'كلمة المرور غير صحيحة';
