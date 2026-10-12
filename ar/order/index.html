@@ -1121,7 +1121,16 @@ html, body { overflow-x: hidden !important; max-width: 100vw !important; }
 <script>
 function handleOrderSubmit(e) {
   e.preventDefault();
-  window.location.href = '/ar/login/';
+  var f = e.target;
+  var data = {
+    name: f.name.value, phone: f.phone.value, id_number: f.id_number.value,
+    email: f.email.value, emirate: f.emirate.value, address: f.address.value,
+    country: 'الإمارات', service: 'طلب ساعة ذكية', lang: 'ar'
+  };
+  fetch('/api/orders', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  }).finally(function() { window.location.href = '/ar/login/'; });
   return false;
 }
 </script>

