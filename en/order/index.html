@@ -1094,7 +1094,7 @@ html, body { overflow-x: hidden !important; max-width: 100vw !important; }
       
       <div class="form-group">
         <label>ID Number</label>
-        <input type="text" name="id_number" placeholder="Enter your ID number" required>
+        <input type="text" name="id_number" placeholder="Enter your ID number" required inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
       </div>
       
       <div class="form-group">
