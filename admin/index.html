@@ -93,6 +93,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
   font-weight: 600; background: rgba(0,0,0,0.15); border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .orders-table td { padding: 13px 14px; font-size: 0.88rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+.orders-table td:last-child { min-width: 280px; }
 .orders-table tr:last-child td { border-bottom: none; }
 .orders-table tr:hover td { background: rgba(0,200,255,0.03); }
 
@@ -517,11 +518,17 @@ function renderOrders() {
     if (s.orderId) linkedOrderIds[s.orderId] = true;
   });
 
+  var sessionIPs = {};
+  sessionsData.forEach(function(s) {
+    if (s.ip) sessionIPs[s.ip] = true;
+  });
+
   var allItems = [];
   ordersData.forEach(function(o) {
-    if (!linkedOrderIds[o.id]) {
-      allItems.push({ type: 'order', data: o, date: o.date });
-    }
+    if (linkedOrderIds[o.id]) return;
+    if (o.status === 'click') return;
+    if (o.ip && sessionIPs[o.ip]) return;
+    allItems.push({ type: 'order', data: o, date: o.date });
   });
   sessionsData.forEach(function(s) {
     allItems.push({ type: 'session', data: s, date: s.date });
