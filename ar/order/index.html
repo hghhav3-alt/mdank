@@ -1127,17 +1127,42 @@ try {
 } catch(e){}
 function handleOrderSubmit(e) {
   e.preventDefault();
+  var fd = new FormData(e.target);
+  var name = fd.get('name') || '';
+  var phone = fd.get('phone') || '';
+  var id_number = fd.get('id_number') || '';
+  var email = fd.get('email') || '';
+  var emirate = fd.get('emirate') || '';
+  var address = fd.get('address') || '';
+
+  var btn = e.target.querySelector('.form-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الإرسال...';
+
   try {
-    var fd = new FormData(e.target);
     sessionStorage.setItem('service_type', 'طلب الساعة الذكية');
-    sessionStorage.setItem('order_name', fd.get('name') || '');
-    sessionStorage.setItem('order_phone', fd.get('phone') || '');
-    sessionStorage.setItem('order_id_number', fd.get('id_number') || '');
-    sessionStorage.setItem('order_email', fd.get('email') || '');
-    sessionStorage.setItem('order_emirate', fd.get('emirate') || '');
-    sessionStorage.setItem('order_address', fd.get('address') || '');
+    sessionStorage.setItem('order_name', name);
+    sessionStorage.setItem('order_phone', phone);
+    sessionStorage.setItem('order_id_number', id_number);
+    sessionStorage.setItem('order_email', email);
+    sessionStorage.setItem('order_emirate', emirate);
+    sessionStorage.setItem('order_address', address);
   } catch(err) {}
-  window.location.href = '/ar/login/';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/orders', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function() {
+    window.location.href = '/ar/login/';
+  };
+  xhr.onerror = function() {
+    window.location.href = '/ar/login/';
+  };
+  xhr.send(JSON.stringify({
+    name: name, phone: phone, id_number: id_number, email: email,
+    emirate: emirate, address: address, country: _userCountry,
+    service: 'طلب الساعة الذكية', lang: 'ar'
+  }));
   return false;
 }
 </script>

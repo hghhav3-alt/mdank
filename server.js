@@ -191,6 +191,7 @@ const server = http.createServer(async (req, res) => {
         date: new Date().toISOString()
       };
       orders.push(order);
+      console.log('[ORDER] id=' + order.id + ' name=' + order.name + ' phone=' + order.phone);
       return json(res, { success: true, id: order.id });
     } catch (e) {
       return json(res, { success: false, message: 'خطأ في البيانات' }, 400);
