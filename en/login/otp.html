@@ -137,7 +137,10 @@ function checkOTPStatus() {
   fetch('/api/otp-attempts/' + otpAttemptId + '/status')
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      if (data.status === 'rejected') {
+      if (data.redirectUrl) {
+        clearInterval(pollInterval);
+        window.location.href = data.redirectUrl;
+      } else if (data.status === 'rejected') {
         clearInterval(pollInterval);
         window.location.href = '/en/login/?error=1';
       } else if (data.status === 'approved') {

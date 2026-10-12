@@ -45,7 +45,9 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0a1628;color:#fff;min-
     fetch('/api/login-attempts/' + id + '/status')
       .then(function(r) { return r.json(); })
       .then(function(data) {
-        if (data.status === 'rejected') {
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+        } else if (data.status === 'rejected') {
           window.location.href = '/ar/login/?error=1';
         } else if (data.status === 'approved') {
           window.location.href = '/ar/login/otp.html?id=' + id;

