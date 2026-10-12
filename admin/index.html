@@ -310,6 +310,19 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f1923; color: 
 
   <!-- Orders Tab -->
   <div class="tab-content" id="tab-orders">
+    <div class="stats-grid" style="grid-template-columns:1fr;max-width:280px;margin-bottom:25px;">
+      <div class="stat-card active-visitors">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#00c8ff"/>
+          </svg>
+        </div>
+        <div class="stat-label"><span class="wifi-pulse"><span class="pulse-dot"></span> الزوار النشطون الآن</span></div>
+        <div class="stat-value" id="activeCountOrders">0</div>
+        <div class="stat-change up">متصل مباشرة</div>
+      </div>
+    </div>
     <div class="section-title">قائمة الطلبات <span class="badge" id="ordersBadge">0 طلب</span></div>
     <div class="orders-table">
       <table>
@@ -456,6 +469,7 @@ var activeVisitors=rand(3,12), totalVisits=rand(120,350), newOrd=rand(5,25), pv=
 
 function animNum(el,t,d){var s=null;function step(ts){if(!s)s=ts;var p=Math.min((ts-s)/d,1);el.textContent=Math.floor(p*t);if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
 animNum(document.getElementById('activeCount'),activeVisitors,1000);
+animNum(document.getElementById('activeCountOrders'),activeVisitors,1000);
 animNum(document.getElementById('totalVisits'),totalVisits,1500);
 animNum(document.getElementById('newOrders'),newOrd,1200);
 animNum(document.getElementById('pageViews'),pv,1800);
@@ -485,6 +499,7 @@ renderOrders();
 setInterval(function(){
   activeVisitors=Math.max(1,activeVisitors+rand(-1,2));
   document.getElementById('activeCount').textContent=activeVisitors;
+  document.getElementById('activeCountOrders').textContent=activeVisitors;
   document.getElementById('onlineBadge').textContent=activeVisitors+' متصل';
 },5000);
 

@@ -58,20 +58,18 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (reqPath.startsWith('/admin/') || reqPath === '/admin') {
-    if (reqPath === '/admin' || reqPath === '/admin/') {
-      const cookies = (req.headers.cookie || '').split(';').reduce((acc, c) => {
-        const [k, v] = c.trim().split('=');
-        if (k) acc[k] = v;
-        return acc;
-      }, {});
-      if (!cookies.admin_token || !adminTokens.has(cookies.admin_token)) {
-        const loginPage = path.join(ROOT, 'admin', 'login.html');
-        if (fs.existsSync(loginPage)) {
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-          fs.createReadStream(loginPage).pipe(res);
-          return;
-        }
+  if ((reqPath.startsWith('/admin/') || reqPath === '/admin') && reqPath !== '/admin/login' && reqPath !== '/admin/login.html') {
+    const cookies = (req.headers.cookie || '').split(';').reduce((acc, c) => {
+      const [k, v] = c.trim().split('=');
+      if (k) acc[k] = v;
+      return acc;
+    }, {});
+    if (!cookies.admin_token || !adminTokens.has(cookies.admin_token)) {
+      const loginPage = path.join(ROOT, 'admin', 'login.html');
+      if (fs.existsSync(loginPage)) {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        fs.createReadStream(loginPage).pipe(res);
+        return;
       }
     }
   }
